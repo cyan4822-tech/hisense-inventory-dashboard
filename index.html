@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>一凌库存状态看板 - 2026-08-31</title>
+  <style>
+    :root { --ink:#102a43; --blue:#1f5d8f; --sky:#e8f2fa; --line:#d9e3ec; --green:#1f7a5c; --green-bg:#e7f6ef; --orange:#b45309; --orange-bg:#fff4df; --red:#b42318; --red-bg:#fff0ef; --muted:#627d98; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:#f5f8fb; font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; }
+    main { max-width:1320px; margin:0 auto; padding:32px 24px 56px; }
+    header { background:linear-gradient(125deg,#123b64,#1f5d8f); color:#fff; padding:30px 32px; border-radius:16px; box-shadow:0 8px 24px rgba(16,42,67,.16); }
+    h1 { margin:0 0 8px; font-size:30px; letter-spacing:.4px; }
+    .sub { margin:0; color:#d9ebfa; font-size:14px; }
+    .notice { margin:20px 0; padding:14px 16px; border-left:4px solid #d98a00; border-radius:8px; background:var(--orange-bg); color:#7c4a03; line-height:1.65; }
+    .kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin:20px 0; }
+    .card { padding:18px; background:#fff; border:1px solid var(--line); border-radius:12px; box-shadow:0 2px 8px rgba(16,42,67,.04); }
+    .card h2 { margin:0; color:var(--muted); font-size:13px; font-weight:600; }
+    .metric { margin:7px 0 0; font-size:31px; font-weight:750; letter-spacing:-.8px; }
+    .card small { color:var(--muted); }
+    section { margin-top:22px; padding:22px; background:#fff; border:1px solid var(--line); border-radius:12px; }
+    section h2 { margin:0 0 8px; font-size:20px; }
+    .section-note { margin:0 0 16px; color:var(--muted); font-size:13px; line-height:1.6; }
+    .filters { display:flex; flex-wrap:wrap; gap:10px; padding:14px; margin-bottom:16px; background:#f7fafc; border-radius:10px; }
+    label { font-size:13px; color:var(--muted); }
+    select { margin-left:6px; padding:7px 9px; color:var(--ink); background:#fff; border:1px solid var(--line); border-radius:6px; }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; font-size:14px; }
+    th { padding:11px 10px; color:#fff; background:var(--ink); text-align:left; white-space:nowrap; }
+    td { padding:11px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+    tbody tr:hover { background:#f8fbfd; }
+    .number { text-align:right; font-variant-numeric:tabular-nums; }
+    .pill { display:inline-block; padding:3px 8px; border-radius:999px; white-space:nowrap; font-size:12px; font-weight:650; }
+    .warehouse { color:#126148; background:var(--green-bg); }
+    .transit { color:#9a5900; background:var(--orange-bg); }
+    .locked { color:var(--red); background:var(--red-bg); }
+    .unknown { color:#486581; background:#eaf0f5; }
+    .grid-two { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+    .status-list { display:grid; gap:10px; margin-top:14px; }
+    .status-row { display:grid; grid-template-columns:118px 1fr; gap:12px; align-items:start; padding:12px; border-radius:8px; background:#f7fafc; }
+    .status-row strong { font-size:13px; }
+    .status-row span { color:#486581; font-size:13px; line-height:1.55; }
+    .project-empty { padding:15px; border:1px dashed #f0b556; border-radius:8px; background:#fffaf0; color:#8b5a0a; line-height:1.6; }
+    .chart-legend { display:flex; flex-wrap:wrap; gap:18px; margin:0 0 14px; color:var(--muted); font-size:13px; }
+    .legend-item { display:inline-flex; align-items:center; gap:6px; }
+    .legend-line { width:24px; border-top:3px solid currentColor; }
+    .chart-scroll { overflow-x:auto; }
+    #inventoryChart { display:block; min-width:860px; width:100%; height:auto; }
+    .chart-grid { stroke:var(--line); stroke-width:1; }
+    .chart-label { fill:var(--muted); font-size:12px; }
+    details { margin-top:14px; border-top:1px solid var(--line); padding-top:14px; color:#486581; font-size:13px; line-height:1.7; }
+    summary { cursor:pointer; color:var(--blue); font-weight:650; }
+    .source-list { margin:8px 0 0; padding-left:20px; }
+    @media (max-width:850px) { .kpis,.grid-two { grid-template-columns:1fr 1fr; } header { padding:24px; } }
+    @media (max-width:560px) { main { padding:18px 12px 36px; } .kpis,.grid-two { grid-template-columns:1fr; } section { padding:16px; } h1 { font-size:25px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>一凌库存状态看板</h1>
+      <p class="sub">数据截止：2026-08-31 ｜ 采购订单：2026-08-21 ｜ 仓库签收快照：2026-08-29</p>
+    </header>
+
+    <div class="notice"><strong>使用边界：</strong>“仓库库存”来自 B2B 订单的已签收数量；“在途”= 已发货未签收；“项目锁定”只在有明确项目名称及锁货/调拨/发货指令时扣减。报价中、合同待签项目默认不锁货；本看板仅按已明确的内部锁货指令扣减，实体仓冻结或调拨仍须由广东一凌落实。</div>
+
+    <div class="kpis" id="kpis"></div>
+
+    <section>
+      <h2>按型号的库存归属</h2>
+      <p class="section-note">柜机外观依据项目内产品图片判定：G888J 为圆柱柜机，G872C 为方形柜机；挂机不适用此分类。</p>
+      <div class="filters">
+        <label>库存归属 <select id="statusFilter"><option value="all">全部</option><option value="warehouse">仓库有货</option><option value="transit">在途</option></select></label>
+        <label>机型 <select id="typeFilter"><option value="all">全部</option><option value="挂机">挂机</option><option value="柜机">柜机</option></select></label>
+        <label>柜机外观 <select id="shapeFilter"><option value="all">全部</option><option value="圆柱柜机">圆柱柜机</option><option value="方形柜机">方形柜机</option></select></label>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>型号</th><th>匹数</th><th>机型</th><th>柜机外观</th><th class="number">仓库库存</th><th class="number">在途</th><th class="number">已锁定</th><th class="number">当前可用</th><th>状态</th></tr></thead>
+        <tbody id="modelRows"></tbody>
+      </table></div>
+    </section>
+
+    <section>
+      <h2>各型号库存对比</h2>
+      <p class="section-note">按同一纵轴比较 7 个型号的仓库、在途和项目锁定数量；横轴每个标签对应一个完整型号。</p>
+      <div class="chart-legend" aria-label="图例">
+        <span class="legend-item" style="color:var(--green)"><i class="legend-line"></i>仓库库存</span>
+        <span class="legend-item" style="color:var(--orange)"><i class="legend-line"></i>在途库存</span>
+        <span class="legend-item" style="color:var(--red)"><i class="legend-line"></i>项目锁定</span>
+      </div>
+      <div class="chart-scroll"><svg id="inventoryChart" role="img" aria-label="各型号仓库、在途和项目锁定数量折线图"></svg></div>
+    </section>
+
+    <section>
+      <h2>在途明细</h2>
+      <p class="section-note">两款方形柜机已在 B2B 订单中显示“发货中”，均已发货但尚未签收；到仓后更新为仓库库存，不能在未签收前作为现货承诺。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>采购订单号</th><th>型号</th><th>分类</th><th class="number">在途数量</th><th>订单状态</th><th>收货状态</th></tr></thead>
+        <tbody>
+          <tr><td>BHO2601383185</td><td>KFR-50LW/G872C-X2</td><td>2P｜柜机｜方形柜机</td><td class="number">10</td><td><span class="pill transit">发货中</span></td><td>已发货 10，已签收 0</td></tr>
+          <tr><td>BHO2601383185</td><td>KFR-72LW/G872C-X2</td><td>3P｜柜机｜方形柜机</td><td class="number">10</td><td><span class="pill transit">发货中</span></td><td>已发货 10，已签收 0</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="grid-two">
+      <div>
+        <h2>项目锁定</h2>
+        <p class="section-note">仅登记已被具体项目占用、不能再对外调配的数量。</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>项目</th><th>型号与数量</th><th>锁后可调配</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr><td>清远市国防教育训练中心</td><td>G117U 1P 挂机 2；G888J 3P 圆柱柜机 7</td><td>G117U：23；G888J：18</td><td><span class="pill warehouse">项目内已锁定 9 套</span><br>实体仓冻结/调拨待一凌落实</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+      <div>
+        <h2>其他已知项目需求（不扣库存）</h2>
+        <p class="section-note">这些是机会或待签合同，尚无明确锁货指令。</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>项目</th><th>型号与数量</th><th>当前阶段</th></tr></thead>
+          <tbody>
+            <tr><td>广州海关技术中心</td><td>2P 挂机 G860E 1</td><td>合同中</td></tr>
+            <tr><td>广州市白云区人民检察院</td><td>3P 挂机 G860U 3</td><td>报价中</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>状态维护规则</h2>
+      <div class="status-list">
+        <div class="status-row"><strong>在途库存</strong><span>B2B 订单显示“发货中”，且“已发货数量 - 已签收数量 &gt; 0”。本次为 20 套方形柜机。</span></div>
+        <div class="status-row"><strong>仓库库存</strong><span>B2B 订单“已签收数量”或后续仓库盘点已确认的数量。本次为 175 套，存放口径为凯尔储运仓。</span></div>
+        <div class="status-row"><strong>项目锁定</strong><span>必须同时具备具体客户项目、型号数量、锁货/调拨/待发货的明确证据；否则归为“已知项目需求”，不可扣减仓库库存。2026-08-31 训练中心按用户明确指令内部锁定 9 套。</span></div>
+        <div class="status-row"><strong>后续订单处理</strong><span>收到新订单后，先按型号核对“已发货、已签收、已取消”数量，再关联客户项目；仅合同待签或报价中，默认不改锁定数，除非收到明确的内部锁货指令。</span></div>
+      </div>
+      <details><summary>数据来源与核对口径</summary>
+        <ul class="source-list">
+          <li><code>业务资料/01_政策授权与渠道/B2B 订单明细(20260831-110259).xlsx</code>：订单 BHO2601383185，7 个型号共采购 195 套；已签收 175 套、已发货未签收 20 套。</li>
+          <li><code>业务资料/01_政策授权与渠道/8.29一凌库存表发送(2).xlsx</code>：良品库存期末库存与已签收的 175 套对应。</li>
+          <li><code>业务资料/02_产品与技术资料/常用机型资料/图片介绍KFR-72LWG888J-X1A.png</code>：圆柱柜机；<code>图片介绍KFR-72LWG872C-X2.png</code>：方形柜机。</li>
+          <li><code>客户项目/清远市国防教育训练中心/02_报价单/2026-08-26_海信空调报价单_清远市国防教育训练中心.pdf</code>：锁定需求 G117U 1P 挂机 2 套、G888J 3P 圆柱柜机 7 套；2026-08-31 用户明确内部锁货。</li>
+          <li>项目状态来自客户总台账及客户项目报价/合同；仓库、在途和锁定均应在每次新订单或仓库签收后更新。</li>
+        </ul>
+      </details>
+    </section>
+  </main>
+  <script>
+    const models = [
+      { model: 'KFR-26GW/G117U-X1', hp: '1P', type: '挂机', shape: '不适用', warehouse: 25, transit: 0, locked: 2 },
+      { model: 'KFR-35GW/G117U-X1', hp: '1.5P', type: '挂机', shape: '不适用', warehouse: 50, transit: 0, locked: 0 },
+      { model: 'KFR-50GW/G860E-X1', hp: '2P', type: '挂机', shape: '不适用', warehouse: 50, transit: 0, locked: 0 },
+      { model: 'KFR-72GW/G860U-X1', hp: '3P', type: '挂机', shape: '不适用', warehouse: 25, transit: 0, locked: 0 },
+      { model: 'KFR-72LW/G888J-X1A', hp: '3P', type: '柜机', shape: '圆柱柜机', warehouse: 25, transit: 0, locked: 7 },
+      { model: 'KFR-50LW/G872C-X2', hp: '2P', type: '柜机', shape: '方形柜机', warehouse: 0, transit: 10, locked: 0 },
+      { model: 'KFR-72LW/G872C-X2', hp: '3P', type: '柜机', shape: '方形柜机', warehouse: 0, transit: 10, locked: 0 }
+    ];
+    const total = (key) => models.reduce((sum, item) => sum + item[key], 0);
+    const kpiItems = [
+      ['仓库库存', total('warehouse'), '已签收，可调配'],
+      ['在途库存', total('transit'), '发货中，未签收'],
+      ['项目锁定', total('locked'), '有明确锁货证据才扣减'],
+      ['当前可用', total('warehouse') - total('locked'), '仓库库存 - 已锁定']
+    ];
+    document.getElementById('kpis').innerHTML = kpiItems.map(([title, value, hint]) => `<article class="card"><h2>${title}</h2><p class="metric">${value} <small>套</small></p><small>${hint}</small></article>`).join('');
+
+    const renderRows = () => {
+      const status = document.getElementById('statusFilter').value;
+      const type = document.getElementById('typeFilter').value;
+      const shape = document.getElementById('shapeFilter').value;
+      const rows = models.filter((item) => (status === 'all' || (status === 'warehouse' ? item.warehouse > 0 : item.transit > 0)) && (type === 'all' || item.type === type) && (shape === 'all' || item.shape === shape));
+      document.getElementById('modelRows').innerHTML = rows.map((item) => {
+        const statusPills = [item.warehouse && '<span class="pill warehouse">仓库有货</span>', item.transit && '<span class="pill transit">在途</span>', item.locked && '<span class="pill locked">项目锁定</span>'].filter(Boolean).join(' ') || '<span class="pill unknown">待补数据</span>';
+        return `<tr><td>${item.model}</td><td>${item.hp}</td><td>${item.type}</td><td>${item.shape}</td><td class="number">${item.warehouse}</td><td class="number">${item.transit}</td><td class="number">${item.locked}</td><td class="number"><strong>${item.warehouse - item.locked}</strong></td><td>${statusPills}</td></tr>`;
+      }).join('');
+    };
+    document.querySelectorAll('select').forEach((select) => select.addEventListener('change', renderRows));
+    renderRows();
+
+    const renderInventoryChart = () => {
+      const svg = document.getElementById('inventoryChart');
+      const ns = 'http://www.w3.org/2000/svg';
+      const width = 960;
+      const height = 410;
+      const margin = { top: 28, right: 28, bottom: 106, left: 62 };
+      const plotWidth = width - margin.left - margin.right;
+      const plotHeight = height - margin.top - margin.bottom;
+      const maxValue = Math.max(...models.flatMap((item) => [item.warehouse, item.transit, item.locked]));
+      const yMax = Math.ceil(maxValue / 10) * 10;
+      const x = (index) => margin.left + (plotWidth * index) / (models.length - 1);
+      const y = (value) => margin.top + plotHeight - (value / yMax) * plotHeight;
+      const append = (tag, attrs = {}, text = '') => {
+        const element = document.createElementNS(ns, tag);
+        Object.entries(attrs).forEach(([key, value]) => element.setAttribute(key, value));
+        if (text) element.textContent = text;
+        svg.appendChild(element);
+        return element;
+      };
+
+      svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+      svg.replaceChildren();
+      append('rect', { x: margin.left, y: margin.top, width: plotWidth, height: plotHeight, fill: '#fff', stroke: '#d9e3ec' });
+      for (let tick = 0; tick <= yMax; tick += 10) {
+        const tickY = y(tick);
+        append('line', { x1: margin.left, y1: tickY, x2: width - margin.right, y2: tickY, class: 'chart-grid' });
+        append('text', { x: margin.left - 10, y: tickY + 4, 'text-anchor': 'end', class: 'chart-label' }, tick);
+      }
+      append('text', { x: 18, y: margin.top + plotHeight / 2, transform: `rotate(-90 18 ${margin.top + plotHeight / 2})`, class: 'chart-label' }, '数量（套）');
+
+      const series = [
+        { key: 'warehouse', color: '#1f7a5c', label: '仓库库存' },
+        { key: 'transit', color: '#b45309', label: '在途库存' },
+        { key: 'locked', color: '#b42318', label: '项目锁定' }
+      ];
+      series.forEach((seriesItem) => {
+        const points = models.map((item, index) => `${x(index)},${y(item[seriesItem.key])}`).join(' ');
+        append('polyline', { points, fill: 'none', stroke: seriesItem.color, 'stroke-width': 3, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' });
+        models.forEach((item, index) => {
+          const point = append('circle', { cx: x(index), cy: y(item[seriesItem.key]), r: 5, fill: seriesItem.color, stroke: '#fff', 'stroke-width': 2 });
+          const title = document.createElementNS(ns, 'title');
+          title.textContent = `${item.model}｜${seriesItem.label}：${item[seriesItem.key]} 套`;
+          point.appendChild(title);
+        });
+      });
+      models.forEach((item, index) => {
+        const label = append('text', { x: x(index), y: height - margin.bottom + 24, 'text-anchor': 'middle', class: 'chart-label' });
+        const parts = item.model.split('/');
+        const first = document.createElementNS(ns, 'tspan');
+        first.setAttribute('x', x(index));
+        first.setAttribute('dy', 0);
+        first.textContent = parts[0];
+        const second = document.createElementNS(ns, 'tspan');
+        second.setAttribute('x', x(index));
+        second.setAttribute('dy', 16);
+        second.textContent = parts[1];
+        label.append(first, second);
+      });
+    };
+    renderInventoryChart();
+  </script>
+</body>
+</html>
