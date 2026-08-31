@@ -186,8 +186,8 @@
       const svg = document.getElementById('inventoryChart');
       const ns = 'http://www.w3.org/2000/svg';
       const width = 960;
-      const height = 440;
-      const margin = { top: 28, right: 28, bottom: 130, left: 62 };
+      const height = 460;
+      const margin = { top: 28, right: 28, bottom: 150, left: 62 };
       const plotWidth = width - margin.left - margin.right;
       const plotHeight = height - margin.top - margin.bottom;
       const maxValue = Math.max(...models.map((item) => item.warehouse + item.transit + item.locked));
@@ -205,7 +205,8 @@
 
       svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
       svg.replaceChildren();
-      append('rect', { x: margin.left, y: margin.top, width: plotWidth, height: height - margin.top - 18, fill: '#fff', stroke: '#d9e3ec' });
+      append('rect', { x: 10, y: margin.top, width: width - 20, height: height - margin.top - 18, fill: '#fff', stroke: '#d9e3ec' });
+      append('rect', { x: margin.left, y: margin.top, width: plotWidth, height: plotHeight, fill: 'none', stroke: '#d9e3ec' });
       for (let tick = 0; tick <= yMax; tick += 10) {
         const tickY = y(tick);
         append('line', { x1: margin.left, y1: tickY, x2: width - margin.right, y2: tickY, class: 'chart-grid' });
@@ -254,7 +255,11 @@
         const classification = document.createElementNS(ns, 'tspan');
         classification.setAttribute('x', x(index));
         classification.setAttribute('dy', 17);
-        classification.textContent = item.shape === '不适用' ? `${item.hp}｜${item.type}` : `${item.hp}｜${item.type}｜${item.shape}`;
+        classification.textContent = `${item.hp}｜${item.type}`;
+        const shape = document.createElementNS(ns, 'tspan');
+        shape.setAttribute('x', x(index));
+        shape.setAttribute('dy', 17);
+        shape.textContent = item.shape === '不适用' ? '' : item.shape;
         const quantities = document.createElementNS(ns, 'tspan');
         quantities.setAttribute('x', x(index));
         quantities.setAttribute('dy', 17);
@@ -266,7 +271,7 @@
         const locked = document.createElementNS(ns, 'tspan');
         locked.setAttribute('fill', '#b42318');
         locked.textContent = `｜锁${item.locked}`;
-        label.append(first, second, classification, quantities, transit, locked);
+        label.append(first, second, classification, shape, quantities, transit, locked);
       });
     };
     renderInventoryChart();
