@@ -51,6 +51,7 @@
     #inventoryChart { display:block; min-width:860px; width:100%; height:auto; }
     .chart-grid { stroke:var(--line); stroke-width:1; }
     .chart-label { fill:var(--muted); font-size:12px; }
+    .chart-segment-value { fill:#fff; font-size:12px; font-weight:700; }
     details { margin-top:14px; border-top:1px solid var(--line); padding-top:14px; color:#486581; font-size:13px; line-height:1.7; }
     summary { cursor:pointer; color:var(--blue); font-weight:650; }
     .source-list { margin:8px 0 0; padding-left:20px; }
@@ -85,7 +86,7 @@
 
     <section>
       <h2>各型号库存对比</h2>
-      <p class="section-note">按同一纵轴比较 7 个型号的仓库、在途和项目锁定数量；每组柱对应一个完整型号。</p>
+      <p class="section-note">每个型号为一根堆叠柱；绿色仓库、橙色在途、红色锁定分段显示，数量直接标在颜色段内及型号下方。</p>
       <div class="chart-legend" aria-label="图例">
         <span class="legend-item" style="color:var(--green)"><i class="legend-line"></i>仓库库存</span>
         <span class="legend-item" style="color:var(--orange)"><i class="legend-line"></i>在途库存</span>
@@ -189,7 +190,7 @@
       const margin = { top: 28, right: 28, bottom: 106, left: 62 };
       const plotWidth = width - margin.left - margin.right;
       const plotHeight = height - margin.top - margin.bottom;
-      const maxValue = Math.max(...models.flatMap((item) => [item.warehouse, item.transit, item.locked]));
+      const maxValue = Math.max(...models.map((item) => item.warehouse + item.transit + item.locked));
       const yMax = Math.ceil(maxValue / 10) * 10;
       const x = (index) => margin.left + (plotWidth * index) / (models.length - 1);
       const y = (value) => margin.top + plotHeight - (value / yMax) * plotHeight;
@@ -216,22 +217,26 @@
         { key: 'transit', color: '#b45309', label: '在途库存' },
         { key: 'locked', color: '#b42318', label: '项目锁定' }
       ];
-      const groupWidth = Math.min(84, (plotWidth / models.length) * 0.78);
-      const barWidth = (groupWidth - 8) / series.length;
-      series.forEach((seriesItem) => {
-        models.forEach((item, index) => {
+      const barWidth = Math.min(58, (plotWidth / models.length) * 0.55);
+      models.forEach((item, index) => {
+        let stackedValue = 0;
+        series.forEach((seriesItem) => {
           const value = item[seriesItem.key];
+          const segmentBottom = stackedValue;
+          stackedValue += value;
+          const segmentHeight = y(segmentBottom) - y(stackedValue);
           const bar = append('rect', {
-            x: x(index) - groupWidth / 2 + 4 + series.indexOf(seriesItem) * barWidth,
-            y: y(value),
-            width: barWidth - 2,
-            height: y(0) - y(value),
+            x: x(index) - barWidth / 2,
+            y: y(stackedValue),
+            width: barWidth,
+            height: segmentHeight,
             rx: 3,
             fill: seriesItem.color
           });
           const title = document.createElementNS(ns, 'title');
           title.textContent = `${item.model}｜${seriesItem.label}：${value} 套`;
           bar.appendChild(title);
+          if (value > 0 && segmentHeight >= 16) append('text', { x: x(index), y: y(stackedValue) + segmentHeight / 2 + 4, 'text-anchor': 'middle', class: 'chart-segment-value' }, value);
         });
       });
       models.forEach((item, index) => {
@@ -245,7 +250,18 @@
         second.setAttribute('x', x(index));
         second.setAttribute('dy', 16);
         second.textContent = parts[1];
-        label.append(first, second);
+        const quantities = document.createElementNS(ns, 'tspan');
+        quantities.setAttribute('x', x(index));
+        quantities.setAttribute('dy', 17);
+        quantities.setAttribute('fill', '#1f7a5c');
+        quantities.textContent = `仓${item.warehouse}`;
+        const transit = document.createElementNS(ns, 'tspan');
+        transit.setAttribute('fill', '#b45309');
+        transit.textContent = `｜在${item.transit}`;
+        const locked = document.createElementNS(ns, 'tspan');
+        locked.setAttribute('fill', '#b42318');
+        locked.textContent = `｜锁${item.locked}`;
+        label.append(first, second, quantities, transit, locked);
       });
     };
     renderInventoryChart();
