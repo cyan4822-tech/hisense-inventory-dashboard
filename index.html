@@ -43,7 +43,7 @@
     .project-empty { padding:15px; border:1px dashed #f0b556; border-radius:8px; background:#fffaf0; color:#8b5a0a; line-height:1.6; }
     .chart-legend { display:flex; flex-wrap:wrap; gap:18px; margin:0 0 14px; color:var(--muted); font-size:13px; }
     .legend-item { display:inline-flex; align-items:center; gap:6px; }
-    .legend-line { width:24px; border-top:3px solid currentColor; }
+    .legend-line { width:18px; height:12px; border-radius:2px; background:currentColor; }
     .chart-scroll { overflow-x:auto; }
     #inventoryChart { display:block; min-width:860px; width:100%; height:auto; }
     .chart-grid { stroke:var(--line); stroke-width:1; }
@@ -82,7 +82,7 @@
 
     <section>
       <h2>各型号库存对比</h2>
-      <p class="section-note">按同一纵轴比较 7 个型号的仓库、在途和项目锁定数量；横轴每个标签对应一个完整型号。</p>
+      <p class="section-note">按同一纵轴比较 7 个型号的仓库、在途和项目锁定数量；每组柱对应一个完整型号。</p>
       <div class="chart-legend" aria-label="图例">
         <span class="legend-item" style="color:var(--green)"><i class="legend-line"></i>仓库库存</span>
         <span class="legend-item" style="color:var(--orange)"><i class="legend-line"></i>在途库存</span>
@@ -213,14 +213,22 @@
         { key: 'transit', color: '#b45309', label: '在途库存' },
         { key: 'locked', color: '#b42318', label: '项目锁定' }
       ];
+      const groupWidth = Math.min(84, (plotWidth / models.length) * 0.78);
+      const barWidth = (groupWidth - 8) / series.length;
       series.forEach((seriesItem) => {
-        const points = models.map((item, index) => `${x(index)},${y(item[seriesItem.key])}`).join(' ');
-        append('polyline', { points, fill: 'none', stroke: seriesItem.color, 'stroke-width': 3, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' });
         models.forEach((item, index) => {
-          const point = append('circle', { cx: x(index), cy: y(item[seriesItem.key]), r: 5, fill: seriesItem.color, stroke: '#fff', 'stroke-width': 2 });
+          const value = item[seriesItem.key];
+          const bar = append('rect', {
+            x: x(index) - groupWidth / 2 + 4 + series.indexOf(seriesItem) * barWidth,
+            y: y(value),
+            width: barWidth - 2,
+            height: y(0) - y(value),
+            rx: 3,
+            fill: seriesItem.color
+          });
           const title = document.createElementNS(ns, 'title');
-          title.textContent = `${item.model}｜${seriesItem.label}：${item[seriesItem.key]} 套`;
-          point.appendChild(title);
+          title.textContent = `${item.model}｜${seriesItem.label}：${value} 套`;
+          bar.appendChild(title);
         });
       });
       models.forEach((item, index) => {
