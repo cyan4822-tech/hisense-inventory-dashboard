@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>一凌库存状态看板 - 2026-08-31</title>
+  <title>一凌库存状态看板 - 2026-09-08</title>
   <style>
     :root { --ink:#102a43; --blue:#1f5d8f; --sky:#e8f2fa; --line:#d9e3ec; --green:#1f7a5c; --green-bg:#e7f6ef; --orange:#b45309; --orange-bg:#fff4df; --red:#b42318; --red-bg:#fff0ef; --muted:#627d98; }
     * { box-sizing:border-box; }
@@ -64,7 +64,7 @@
   <main>
     <header>
       <h1>一凌库存状态看板</h1>
-      <p class="sub">数据截止：2026-08-31 ｜ 采购订单：2026-08-21 ｜ 仓库签收快照：2026-08-29</p>
+      <p class="sub">数据截止：2026-09-08（外仓表更新，出入库记录至 9-5）｜ 采购订单：2026-08-21 ｜ 仓库签收快照：2026-09-08（凯尔仓，含 9-2/9-3 入仓方柜 20 套）</p>
     </header>
 
     <section>
@@ -97,13 +97,13 @@
     </section>
 
     <section>
-      <h2>在途明细</h2>
-      <p class="section-note">两款方形柜机已在 B2B 订单中显示“发货中”，均已发货但尚未签收；到仓后更新为仓库库存，不能在未签收前作为现货承诺。</p>
+      <h2>在途库存：0 套</h2>
+      <p class="section-note">原 BHO2601383185 的 20 套方形柜机（2P/3P 各 10）已于 2026-09-02 / 09-03 入仓签收，转入仓库库存；当前无在途。</p>
       <div class="table-wrap"><table>
-        <thead><tr><th>采购订单号</th><th>型号</th><th>分类</th><th class="number">在途数量</th><th>订单状态</th><th>收货状态</th></tr></thead>
+        <thead><tr><th>采购订单号</th><th>型号</th><th>分类</th><th class="number">到仓数量</th><th>到仓日期</th><th>状态</th></tr></thead>
         <tbody>
-          <tr><td>BHO2601383185</td><td>KFR-50LW/G872C-X2</td><td>2P｜柜机｜方形柜机</td><td class="number">10</td><td><span class="pill transit">发货中</span></td><td>已发货 10，已签收 0</td></tr>
-          <tr><td>BHO2601383185</td><td>KFR-72LW/G872C-X2</td><td>3P｜柜机｜方形柜机</td><td class="number">10</td><td><span class="pill transit">发货中</span></td><td>已发货 10，已签收 0</td></tr>
+          <tr><td>BHO2601383185</td><td>KFR-50LW/G872C-X2</td><td>2P｜柜机｜方形柜机</td><td class="number">10</td><td>2026-09-02</td><td><span class="pill warehouse">已签收入仓</span></td></tr>
+          <tr><td>BHO2601383185</td><td>KFR-72LW/G872C-X2</td><td>3P｜柜机｜方形柜机</td><td class="number">10</td><td>2026-09-03</td><td><span class="pill warehouse">已签收入仓</span></td></tr>
         </tbody>
       </table></div>
     </section>
@@ -135,15 +135,16 @@
     <section>
       <h2>状态维护规则</h2>
       <div class="status-list">
-        <div class="status-row"><strong>在途库存</strong><span>B2B 订单显示“发货中”，且“已发货数量 - 已签收数量 &gt; 0”。本次为 20 套方形柜机。</span></div>
-        <div class="status-row"><strong>仓库库存</strong><span>B2B 订单“已签收数量”或后续仓库盘点已确认的数量。本次为 175 套，存放口径为凯尔储运仓。</span></div>
+        <div class="status-row"><strong>在途库存</strong><span>本次为 0 套；原 20 套方形柜机（G872C 2P/3P 各 10）已于 2026-09-02/09-03 入仓签收，转入仓库库存。</span></div>
+        <div class="status-row"><strong>仓库库存</strong><span>B2B 订单“已签收数量”或仓库盘点已确认的数量。本次为 195 套（原 175 套＋方柜到仓 20 套），存放口径为凯尔储运仓。</span></div>
         <div class="status-row"><strong>项目锁定</strong><span>必须同时具备具体客户项目、型号数量、锁货/调拨/待发货的明确证据；否则归为“已知项目需求”，不可扣减仓库库存。2026-08-31 训练中心按用户明确指令内部锁定 9 套。</span></div>
         <div class="status-row"><strong>后续订单处理</strong><span>收到新订单后，先按型号核对“已发货、已签收、已取消”数量，再关联客户项目；仅合同待签或报价中，默认不改锁定数，除非收到明确的内部锁货指令。</span></div>
       </div>
       <details><summary>数据来源与核对口径</summary>
         <ul class="source-list">
-          <li><code>业务资料/01_政策授权与渠道/B2B 订单明细(20260831-110259).xlsx</code>：订单 BHO2601383185，7 个型号共采购 195 套；已签收 175 套、已发货未签收 20 套。</li>
-          <li><code>业务资料/01_政策授权与渠道/8.29一凌库存表发送(2).xlsx</code>：良品库存期末库存与已签收的 175 套对应。</li>
+          <li><code>业务资料/01_政策授权与渠道/B2B 订单明细(20260831-110259).xlsx</code>：订单 BHO2601383185，7 个型号共采购 195 套；2026-09-08 前已全部签收入仓（175＋方柜 20），在途 0。</li>
+          <li><code>外仓库存管理表（9 月份，2026-09-08 更新）</code>：凯尔仓按完整型号核对的入出与盘点记录；方柜 2P/3P 各 10 于 9-2/9-3 入仓；G117U 1P、G888J 与项目锁定一致（可用 23、18）。</li>
+          <li><code>业务资料/01_政策授权与渠道/8.29一凌库存表发送(2).xlsx</code>：良品库存期末库存与已签收数量对应。</li>
           <li><code>业务资料/02_产品与技术资料/常用机型资料/图片介绍KFR-72LWG888J-X1A.png</code>：圆柱柜机；<code>图片介绍KFR-72LWG872C-X2.png</code>：方形柜机。</li>
           <li><code>客户项目/清远市国防教育训练中心/02_报价单/2026-08-26_海信空调报价单_清远市国防教育训练中心.pdf</code>：锁定需求 G117U 1P 挂机 2 套、G888J 3P 圆柱柜机 7 套；2026-08-31 用户明确内部锁货。</li>
           <li>项目状态来自客户总台账及客户项目报价/合同；仓库、在途和锁定均应在每次新订单或仓库签收后更新。</li>
@@ -158,13 +159,13 @@
       { model: 'KFR-50GW/G860E-X1', hp: '2P', type: '挂机', shape: '不适用', warehouse: 50, transit: 0, locked: 0 },
       { model: 'KFR-72GW/G860U-X1', hp: '3P', type: '挂机', shape: '不适用', warehouse: 25, transit: 0, locked: 0 },
       { model: 'KFR-72LW/G888J-X1A', hp: '3P', type: '柜机', shape: '圆柱柜机', warehouse: 25, transit: 0, locked: 7 },
-      { model: 'KFR-50LW/G872C-X2', hp: '2P', type: '柜机', shape: '方形柜机', warehouse: 0, transit: 10, locked: 0 },
-      { model: 'KFR-72LW/G872C-X2', hp: '3P', type: '柜机', shape: '方形柜机', warehouse: 0, transit: 10, locked: 0 }
+      { model: 'KFR-50LW/G872C-X2', hp: '2P', type: '柜机', shape: '方形柜机', warehouse: 10, transit: 0, locked: 0 },
+      { model: 'KFR-72LW/G872C-X2', hp: '3P', type: '柜机', shape: '方形柜机', warehouse: 10, transit: 0, locked: 0 }
     ];
     const total = (key) => models.reduce((sum, item) => sum + item[key], 0);
     const kpiItems = [
       ['仓库库存', total('warehouse'), '已签收，可调配'],
-      ['在途库存', total('transit'), '发货中，未签收'],
+      ['在途库存', total('transit'), '当前无在途'],
       ['项目锁定', total('locked'), '有明确锁货证据才扣减'],
       ['当前可用', total('warehouse') - total('locked'), '仓库库存 - 已锁定']
     ];
