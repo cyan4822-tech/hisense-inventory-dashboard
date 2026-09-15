@@ -116,9 +116,10 @@
           <thead><tr><th>项目</th><th>型号与数量</th><th>锁后可调配</th><th>状态</th></tr></thead>
         <tbody>
           <tr><td>清远市国防教育训练中心</td><td>G117U 1P 挂机 2；G888J 3P 圆柱柜机 7</td><td>已全部交付并回款（2026-09-11），锁定已释放</td><td><span class="pill warehouse">已闭环释放</span><br>9 套货已交付，内部锁定清零；仓库数已同扣 25→23 / 25→18</td></tr>
-          <tr><td>阳山县秤架民族学校</td><td>G860E 2P 挂机 13</td><td>G860E：35（一凌口径）/ 34（凯尔口径）</td><td><span class="pill locked">硬锁 13 套</span><br>合同 YLGS-26090558 待签；2026-09-11 用户明确指令锁货（待签合同按硬锁计入）</td></tr>
-          <tr><td>阳山县医疗保障局</td><td>G860E 2P 挂机 1</td><td>G860E：35（一凌口径）/ 34（凯尔口径）</td><td><span class="pill locked">硬锁 1 套</span><br>合同 2026-09-12 已出 doc（9-11 定稿）+ pdf（图片扫描版）；按 DEC-20260915-01「有合同即锁」当次会话即时锁定，不待签回、不等刷新</td></tr>
-          <tr><td>广州海关技术中心</td><td>G860E 2P 挂机 1</td><td>G860E：35（一凌口径）/ 34（凯尔口径）</td><td><span class="pill locked">硬锁 1 套</span><br>合同中；2026-09-15 用户明确指令"合同中，这个也锁"，按用户指令即时锁定（我方尚未生成合同 doc/pdf，仅 8-17 报价单，锁依据为用户指令）</td></tr>
+          <tr><td>阳山县秤架民族学校</td><td>G860E 2P 挂机 13</td><td>G860E：20（一凌口径）/ 19（凯尔口径）</td><td><span class="pill locked">硬锁 13 套</span><br>合同 YLGS-26090558 待签；2026-09-11 用户明确指令锁货（待签合同按硬锁计入）</td></tr>
+          <tr><td>阳山县医疗保障局</td><td>G860E 2P 挂机 1</td><td>G860E：20（一凌口径）/ 19（凯尔口径）</td><td><span class="pill locked">硬锁 1 套</span><br>合同 2026-09-12 已出 doc（9-11 定稿）+ pdf（图片扫描版）；按 DEC-20260915-01「有合同即锁」当次会话即时锁定，不待签回、不等刷新</td></tr>
+          <tr><td>广州海关技术中心</td><td>G860E 2P 挂机 1</td><td>G860E：20（一凌口径）/ 19（凯尔口径）</td><td><span class="pill locked">硬锁 1 套</span><br>合同中；2026-09-15 用户明确指令"合同中，这个也锁"，按用户指令即时锁定（我方尚未生成合同 doc/pdf，仅 8-17 报价单，锁依据为用户指令）</td></tr>
+          <tr><td>GCXP空调（深圳市光明区建筑工务署）</td><td>G860E 2P 挂机 15</td><td>G860E：20（一凌口径）/ 19（凯尔口径）</td><td><span class="pill locked">硬锁 15 套</span><br>2026-09-15 用户明确指令"锁一下库存，自己内部项目"；报备跟进人 广东一凌·蔡阳、报备时间 2026-09-15，按用户指令即时硬锁（报备项目，尚未出合同 doc/pdf）</td></tr>
         </tbody>
         </table></div>
       </div>
@@ -159,7 +160,7 @@
     const models = [
       { model: 'KFR-26GW/G117U-X1', hp: '1P', type: '挂机', shape: '不适用', warehouse: 23, transit: 0, locked: 0 },
       { model: 'KFR-35GW/G117U-X1', hp: '1.5P', type: '挂机', shape: '不适用', warehouse: 50, transit: 0, locked: 0 },
-      { model: 'KFR-50GW/G860E-X1', hp: '2P', type: '挂机', shape: '不适用', warehouse: 50, transit: 0, locked: 15 },
+      { model: 'KFR-50GW/G860E-X1', hp: '2P', type: '挂机', shape: '不适用', warehouse: 50, transit: 0, locked: 30 },
       { model: 'KFR-72GW/G860U-X1', hp: '3P', type: '挂机', shape: '不适用', warehouse: 25, transit: 0, locked: 0 },
       { model: 'KFR-72LW/G888J-X1A', hp: '3P', type: '柜机', shape: '圆柱柜机', warehouse: 18, transit: 0, locked: 0 },
       { model: 'KFR-50LW/G872C-X2', hp: '2P', type: '柜机', shape: '方形柜机', warehouse: 10, transit: 0, locked: 0 },
