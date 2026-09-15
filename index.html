@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>一凌库存状态看板 - 2026-09-08</title>
+  <title>一凌库存状态看板 - 2026-09-15</title>
   <style>
     :root { --ink:#102a43; --blue:#1f5d8f; --sky:#e8f2fa; --line:#d9e3ec; --green:#1f7a5c; --green-bg:#e7f6ef; --orange:#b45309; --orange-bg:#fff4df; --red:#b42318; --red-bg:#fff0ef; --muted:#627d98; }
     * { box-sizing:border-box; }
@@ -64,7 +64,7 @@
   <main>
     <header>
       <h1>一凌库存状态看板</h1>
-      <p class="sub">数据截止：2026-09-08（外仓表更新，出入库记录至 9-5）｜ 采购订单：2026-08-21 ｜ 仓库签收快照：2026-09-08（凯尔仓，含 9-2/9-3 入仓方柜 20 套）</p>
+      <p class="sub">数据截止：2026-09-15（外仓表更新，出入库记录至 9-5）｜ 采购订单：2026-08-21 ｜ 仓库签收快照：2026-09-15（凯尔仓，含 9-2/9-3 入仓方柜 20 套）</p>
     </header>
 
     <section>
@@ -115,7 +115,8 @@
         <div class="table-wrap"><table>
           <thead><tr><th>项目</th><th>型号与数量</th><th>锁后可调配</th><th>状态</th></tr></thead>
           <tbody>
-            <tr><td>清远市国防教育训练中心</td><td>G117U 1P 挂机 2；G888J 3P 圆柱柜机 7</td><td>G117U：23；G888J：18</td><td><span class="pill warehouse">项目内已锁定 9 套</span><br>实体仓冻结/调拨待一凌落实</td></tr>
+            <tr><td>清远市国防教育训练中心</td><td>G117U 1P 挂机 2；G888J 3P 圆柱柜机 7</td><td>已全部交付并回款（2026-09-11），锁定已释放</td><td><span class="pill warehouse">已闭环释放</span><br>9 套货已交付，内部锁定清零；仓库数已同扣 25→23 / 25→18</td></tr>
+            <tr><td>阳山县秤架民族学校</td><td>G860E 2P 挂机 13</td><td>G860E：37（一凌口径）/ 36（凯尔口径）</td><td><span class="pill locked">硬锁 13 套</span><br>合同 YLGS-26090558 待签；2026-09-11 用户明确指令锁货（待签合同按硬锁计入）</td></tr>
           </tbody>
         </table></div>
       </div>
@@ -126,7 +127,7 @@
           <thead><tr><th>项目</th><th>型号与数量</th><th>当前阶段</th></tr></thead>
           <tbody>
             <tr><td>广州海关技术中心</td><td>2P 挂机 G860E 1</td><td>合同中</td></tr>
-            <tr><td>广州市白云区人民检察院</td><td>3P 挂机 G860U 3</td><td>报价中</td></tr>
+            <tr><td>广州市白云区人民检察院</td><td>3P 挂机 G860U 3</td><td><span class="pill unknown">失单（2026-09-10 确认，已与别家合作）</span></td></tr>
           </tbody>
         </table></div>
       </div>
@@ -144,6 +145,7 @@
         <ul class="source-list">
           <li><code>业务资料/01_政策授权与渠道/B2B 订单明细(20260831-110259).xlsx</code>：订单 BHO2601383185，7 个型号共采购 195 套；2026-09-08 前已全部签收入仓（175＋方柜 20），在途 0。</li>
           <li><code>外仓库存管理表（9 月份，2026-09-08 更新）</code>：凯尔仓按完整型号核对的入出与盘点记录；方柜 2P/3P 各 10 于 9-2/9-3 入仓；G117U 1P、G888J 与项目锁定一致（可用 23、18）。</li>
+          <li>G860E 2P 挂机 9-5 出库 1 台：经确认为<strong>运输损坏件</strong>，待回收后补送新机——不属于客户项目锁货，不与广州海关技术中心等任何项目关联；当前可用量维持 50 套不预扣，待替换机实际出库后按外仓表出库记录更新。</li>
           <li><code>业务资料/01_政策授权与渠道/8.29一凌库存表发送(2).xlsx</code>：良品库存期末库存与已签收数量对应。</li>
           <li><code>业务资料/02_产品与技术资料/常用机型资料/图片介绍KFR-72LWG888J-X1A.png</code>：圆柱柜机；<code>图片介绍KFR-72LWG872C-X2.png</code>：方形柜机。</li>
           <li><code>客户项目/清远市国防教育训练中心/02_报价单/2026-08-26_海信空调报价单_清远市国防教育训练中心.pdf</code>：锁定需求 G117U 1P 挂机 2 套、G888J 3P 圆柱柜机 7 套；2026-08-31 用户明确内部锁货。</li>
@@ -154,11 +156,11 @@
   </main>
   <script>
     const models = [
-      { model: 'KFR-26GW/G117U-X1', hp: '1P', type: '挂机', shape: '不适用', warehouse: 25, transit: 0, locked: 2 },
+      { model: 'KFR-26GW/G117U-X1', hp: '1P', type: '挂机', shape: '不适用', warehouse: 23, transit: 0, locked: 0 },
       { model: 'KFR-35GW/G117U-X1', hp: '1.5P', type: '挂机', shape: '不适用', warehouse: 50, transit: 0, locked: 0 },
-      { model: 'KFR-50GW/G860E-X1', hp: '2P', type: '挂机', shape: '不适用', warehouse: 50, transit: 0, locked: 0 },
+      { model: 'KFR-50GW/G860E-X1', hp: '2P', type: '挂机', shape: '不适用', warehouse: 50, transit: 0, locked: 13 },
       { model: 'KFR-72GW/G860U-X1', hp: '3P', type: '挂机', shape: '不适用', warehouse: 25, transit: 0, locked: 0 },
-      { model: 'KFR-72LW/G888J-X1A', hp: '3P', type: '柜机', shape: '圆柱柜机', warehouse: 25, transit: 0, locked: 7 },
+      { model: 'KFR-72LW/G888J-X1A', hp: '3P', type: '柜机', shape: '圆柱柜机', warehouse: 18, transit: 0, locked: 0 },
       { model: 'KFR-50LW/G872C-X2', hp: '2P', type: '柜机', shape: '方形柜机', warehouse: 10, transit: 0, locked: 0 },
       { model: 'KFR-72LW/G872C-X2', hp: '3P', type: '柜机', shape: '方形柜机', warehouse: 10, transit: 0, locked: 0 }
     ];
