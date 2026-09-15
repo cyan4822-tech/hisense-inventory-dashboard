@@ -114,10 +114,11 @@
         <p class="section-note">仅登记已被具体项目占用、不能再对外调配的数量。</p>
         <div class="table-wrap"><table>
           <thead><tr><th>项目</th><th>型号与数量</th><th>锁后可调配</th><th>状态</th></tr></thead>
-          <tbody>
-            <tr><td>清远市国防教育训练中心</td><td>G117U 1P 挂机 2；G888J 3P 圆柱柜机 7</td><td>已全部交付并回款（2026-09-11），锁定已释放</td><td><span class="pill warehouse">已闭环释放</span><br>9 套货已交付，内部锁定清零；仓库数已同扣 25→23 / 25→18</td></tr>
-            <tr><td>阳山县秤架民族学校</td><td>G860E 2P 挂机 13</td><td>G860E：37（一凌口径）/ 36（凯尔口径）</td><td><span class="pill locked">硬锁 13 套</span><br>合同 YLGS-26090558 待签；2026-09-11 用户明确指令锁货（待签合同按硬锁计入）</td></tr>
-          </tbody>
+        <tbody>
+          <tr><td>清远市国防教育训练中心</td><td>G117U 1P 挂机 2；G888J 3P 圆柱柜机 7</td><td>已全部交付并回款（2026-09-11），锁定已释放</td><td><span class="pill warehouse">已闭环释放</span><br>9 套货已交付，内部锁定清零；仓库数已同扣 25→23 / 25→18</td></tr>
+          <tr><td>阳山县秤架民族学校</td><td>G860E 2P 挂机 13</td><td>G860E：36（一凌口径）/ 35（凯尔口径）</td><td><span class="pill locked">硬锁 13 套</span><br>合同 YLGS-26090558 待签；2026-09-11 用户明确指令锁货（待签合同按硬锁计入）</td></tr>
+          <tr><td>阳山县医疗保障局</td><td>G860E 2P 挂机 1</td><td>G860E：36（一凌口径）/ 35（凯尔口径）</td><td><span class="pill locked">硬锁 1 套</span><br>合同 2026-09-12 已出 doc（9-11 定稿）+ pdf（图片扫描版）；按 DEC-20260915-01「有合同即锁」当次会话即时锁定，不待签回、不等刷新</td></tr>
+        </tbody>
         </table></div>
       </div>
       <div>
@@ -158,7 +159,7 @@
     const models = [
       { model: 'KFR-26GW/G117U-X1', hp: '1P', type: '挂机', shape: '不适用', warehouse: 23, transit: 0, locked: 0 },
       { model: 'KFR-35GW/G117U-X1', hp: '1.5P', type: '挂机', shape: '不适用', warehouse: 50, transit: 0, locked: 0 },
-      { model: 'KFR-50GW/G860E-X1', hp: '2P', type: '挂机', shape: '不适用', warehouse: 50, transit: 0, locked: 13 },
+      { model: 'KFR-50GW/G860E-X1', hp: '2P', type: '挂机', shape: '不适用', warehouse: 50, transit: 0, locked: 14 },
       { model: 'KFR-72GW/G860U-X1', hp: '3P', type: '挂机', shape: '不适用', warehouse: 25, transit: 0, locked: 0 },
       { model: 'KFR-72LW/G888J-X1A', hp: '3P', type: '柜机', shape: '圆柱柜机', warehouse: 18, transit: 0, locked: 0 },
       { model: 'KFR-50LW/G872C-X2', hp: '2P', type: '柜机', shape: '方形柜机', warehouse: 10, transit: 0, locked: 0 },
