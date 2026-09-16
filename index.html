@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>一凌库存状态看板 - 2026-09-15</title>
+  <title>一凌库存状态看板 - 2026-09-16</title>
   <style>
     :root { --ink:#102a43; --blue:#1f5d8f; --sky:#e8f2fa; --line:#d9e3ec; --green:#1f7a5c; --green-bg:#e7f6ef; --orange:#b45309; --orange-bg:#fff4df; --red:#b42318; --red-bg:#fff0ef; --muted:#627d98; }
     * { box-sizing:border-box; }
@@ -38,6 +38,10 @@
     .transit { color:#9a5900; background:var(--orange-bg); }
     .locked { color:var(--red); background:var(--red-bg); }
     .unknown { color:#486581; background:#eaf0f5; }
+    .short { color:#8a6d00; background:#fff4cc; }
+    .cell-short { background:#fff7d6; }
+    .short-note { padding:11px 13px; margin:12px 0 0; border:1px dashed #d9a300; border-radius:8px; background:#fffbea; color:#8a6d00; font-size:13px; line-height:1.65; }
+    .short-note strong { color:#7a5c00; }
     .grid-two { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
     .status-list { display:grid; gap:10px; margin-top:14px; }
     .status-row { display:grid; grid-template-columns:118px 1fr; gap:12px; align-items:start; padding:12px; border-radius:8px; background:#f7fafc; }
@@ -64,7 +68,7 @@
   <main>
     <header>
       <h1>一凌库存状态看板</h1>
-      <p class="sub">数据截止：2026-09-15 17:00（外仓表 9-15 14:48 更新，出入库记录至 9-15）｜ 采购订单：2026-08-21 ｜ 仓库签收快照：2026-09-15（凯尔仓，含 9-2/9-3 入仓方柜 20 套；9-15 出库 G860E 14 套已同扣仓库）</p>
+      <p class="sub">数据截止：2026-09-15 17:00（外仓表 9-15 14:48 更新，出入库记录至 9-15）｜ 锁定更新：2026-09-16 09:40（茂名技师学院合同锁货 26 套）｜ 采购订单：2026-08-21 ｜ 仓库签收快照：2026-09-15（凯尔仓，含 9-2/9-3 入仓方柜 20 套；9-15 出库 G860E 14 套已同扣仓库）</p>
     </header>
 
     <section>
@@ -78,9 +82,11 @@
       <div class="chart-scroll"><svg id="inventoryChart" role="img" aria-label="各型号仓库、在途和项目锁定数量堆叠柱状图"></svg></div>
     </section>
 
-    <div class="notice"><strong>使用边界：</strong>“仓库库存”来自 B2B 订单的已签收数量；“在途”= 已发货未签收；“项目锁定”只在有明确项目名称及锁货/调拨/发货指令时扣减。报价中、合同待签项目默认不锁货；本看板仅按已明确的内部锁货指令扣减，实体仓冻结或调拨仍须由广东一凌落实。</div>
+    <div class="notice"><strong>使用边界：</strong>“仓库库存”来自 B2B 订单的已签收数量；“在途”= 已发货未签收；“项目锁定”只在有明确项目名称及锁货/调拨/发货指令时扣减。锁货口径（2026-09-15 起，DEC-20260915-01）：<strong>我方生成/定稿合同文档即视为要货确认、可据此锁库存</strong>；仅口头、报备中或未出合同文档的仍按“已知项目需求”不锁。锁后须逐型号核验可用量不为负，出现缺口的型号以黄色标记。本看板仅按已明确的内部锁货指令扣减，实体仓冻结或调拨仍须由广东一凌落实。</div>
 
     <div class="kpis" id="kpis"></div>
+
+    <div class="short-note"><strong>⚠ 库存缺口（黄色标记）：</strong>2P 挂机 <code>KFR-50GW/G860E-X1</code> 仓库 36 套、已锁定 37 套 → 可用 <strong>−1 套</strong>（凯尔口径 −2）。缺口 1 套来自<strong>茂名技师学院</strong>合同（2026-09-16 我方已出、待签，2P 挂机 21 台）——按用户 2026-09-16 明确指令「锁 21 台，不足的用黄色标记」登记，不隐瞒缺口。补货去向：向广东一凌（蔡阳）确认可调库存，或等 9-5 运输损坏件替换机到货后按外仓表出库记录回填。</div>
 
     <section>
       <h2>按型号的库存归属</h2>
@@ -116,11 +122,12 @@
           <thead><tr><th>项目</th><th>型号与数量</th><th>锁后可调配</th><th>状态</th></tr></thead>
         <tbody>
           <tr><td>清远市国防教育训练中心</td><td>G117U 1P 挂机 2；G888J 3P 圆柱柜机 7</td><td>已全部交付并回款（2026-09-11），锁定已释放</td><td><span class="pill warehouse">已闭环释放</span><br>9 套货已交付，内部锁定清零；仓库数已同扣 25→23 / 25→18</td></tr>
-          <tr><td>阳山县秤架民族学校</td><td>G860E 2P 挂机 13</td><td>G860E：20（一凌口径）/ 19（凯尔口径）</td><td><span class="pill warehouse">已交付释放</span><br>外仓出库明细：合同 YLGS-26090558 于 2026-09-15 出库 13 套；硬锁 13 套释放、仓库 50→37 同扣（沿用清远交付口径：货出库即同扣仓库并清锁定）</td></tr>
-          <tr><td>阳山县医疗保障局</td><td>G860E 2P 挂机 1</td><td>G860E：20（一凌口径）/ 19（凯尔口径）</td><td><span class="pill warehouse">已签署并交付</span><br>共享盘扫描件（2026-09-15 上传）：甲乙双方盖章、签订日期 2026-09-14，合同编号 YLGS-26090567——⚠ 共享盘文件名为 26090556、出库明细同记 26090556，与合同内容编号不一致，待与一凌（蔡阳）书面核实；2026-09-15 出库 1 套，硬锁释放、仓库同扣</td></tr>
-          <tr><td>广州海关技术中心</td><td>G860E 2P 挂机 1</td><td>G860E：20（一凌口径）/ 19（凯尔口径）</td><td><span class="pill locked">硬锁 1 套</span><br>合同中；2026-09-15 用户明确指令"合同中，这个也锁"，按用户指令即时锁定（我方尚未生成合同 doc/pdf，仅 8-17 报价单，锁依据为用户指令）</td></tr>
-          <tr><td>GCXP空调（深圳市光明区建筑工务署）</td><td>G860E 2P 挂机 15</td><td>G860E：20（一凌口径）/ 19（凯尔口径）</td><td><span class="pill locked">硬锁 15 套</span><br>2026-09-15 用户明确指令"锁一下库存，自己内部项目"；报备跟进人 广东一凌·蔡阳、报备时间 2026-09-15，按用户指令即时硬锁（报备项目，尚未出合同 doc/pdf）</td></tr>
-          <tr><td>广州市海珠区沙园街道办事处</td><td>G117U 1.5P 挂机 1</td><td>G117U 1.5P：49</td><td><span class="pill locked">硬锁 1 套</span><br>合同 YLGS-26090574 我方 2026-09-15 已出 doc（1.5P 挂机×1 @2,390＋辅材 1,980＝4,370 元，无章待签）；每日刷新按 DEC-20260915-01「合同已出待签即锁」兜底补锁</td></tr>
+          <tr><td>阳山县秤架民族学校</td><td>G860E 2P 挂机 13</td><td><span class="pill short">G860E：−1（一凌口径）/ −2（凯尔口径）</span></td><td><span class="pill warehouse">已交付释放</span><br>外仓出库明细：合同 YLGS-26090558 于 2026-09-15 出库 13 套；硬锁 13 套释放、仓库 50→37 同扣（沿用清远交付口径：货出库即同扣仓库并清锁定）</td></tr>
+          <tr><td>阳山县医疗保障局</td><td>G860E 2P 挂机 1</td><td><span class="pill short">G860E：−1（一凌口径）/ −2（凯尔口径）</span></td><td><span class="pill warehouse">已签署并交付</span><br>共享盘扫描件（2026-09-15 上传）：甲乙双方盖章、签订日期 2026-09-14，合同编号 YLGS-26090567——⚠ 共享盘文件名为 26090556、出库明细同记 26090556，与合同内容编号不一致，待与一凌（蔡阳）书面核实；2026-09-15 出库 1 套，硬锁释放、仓库同扣</td></tr>
+          <tr><td>广州海关技术中心</td><td>G860E 2P 挂机 1</td><td><span class="pill short">G860E：−1（一凌口径）/ −2（凯尔口径）</span></td><td><span class="pill locked">硬锁 1 套</span><br>合同中；2026-09-15 用户明确指令"合同中，这个也锁"，按用户指令即时锁定（我方尚未生成合同 doc/pdf，仅 8-17 报价单，锁依据为用户指令）</td></tr>
+          <tr><td>GCXP空调（深圳市光明区建筑工务署）</td><td>G860E 2P 挂机 15</td><td><span class="pill short">G860E：−1（一凌口径）/ −2（凯尔口径）</span></td><td><span class="pill locked">硬锁 15 套</span><br>2026-09-15 用户明确指令"锁一下库存，自己内部项目"；报备跟进人 广东一凌·蔡阳、报备时间 2026-09-15，按用户指令即时硬锁（报备项目，尚未出合同 doc/pdf）</td></tr>
+          <tr><td>广州市海珠区沙园街道办事处</td><td>G117U 1.5P 挂机 1</td><td>G117U 1.5P：44</td><td><span class="pill locked">硬锁 1 套</span><br>合同 YLGS-26090574 我方 2026-09-15 已出 doc（1.5P 挂机×1 @2,390＋辅材 1,980＝4,370 元，无章待签）；每日刷新按 DEC-20260915-01「合同已出待签即锁」兜底补锁</td></tr>
+          <tr><td>茂名技师学院</td><td>G860E 2P 挂机 21；G117U 1.5P 挂机 5</td><td><span class="pill short">G860E：−1（一凌口径）/ −2（凯尔口径）</span>；G117U 1.5P：44</td><td><span class="pill short">硬锁 26 套（含缺口 1）</span><br>合同 `2026-09-16_空调采购合同_茂名技师学院.docx` 我方 2026-09-16 已出（合同编号留空待补、甲方要素待补，无章待签，设备款 85,450 元＝1.5P×5 @2,390＋2P×21 @3,500）；按 DEC-20260915-01 当次会话即时锁货；<strong>2P 挂机锁 21 套后 G860E 可用为 −1（缺口 1 套）</strong>，按用户 2026-09-16 指令「锁 21 台，不足的用黄色标记」登记，待向一凌确认可调库存/替换机到货后补齐</td></tr>
         </tbody>
         </table></div>
       </div>
@@ -140,8 +147,9 @@
       <h2>状态维护规则</h2>
       <div class="status-list">
         <div class="status-row"><strong>在途库存</strong><span>本次为 0 套；原 20 套方形柜机（G872C 2P/3P 各 10）已于 2026-09-02/09-03 入仓签收，转入仓库库存。</span></div>
-        <div class="status-row"><strong>仓库库存</strong><span>B2B 订单“已签收数量”或仓库盘点已确认的数量。本次为 195 套（原 175 套＋方柜到仓 20 套），存放口径为凯尔储运仓。</span></div>
-        <div class="status-row"><strong>项目锁定</strong><span>必须同时具备具体客户项目、型号数量、锁货/调拨/待发货的明确证据；否则归为“已知项目需求”，不可扣减仓库库存。2026-08-31 训练中心按用户明确指令内部锁定 9 套。</span></div>
+        <div class="status-row"><strong>仓库库存</strong><span>B2B 订单“已签收数量”或仓库盘点已确认的数量。本次为 172 套（原 195 套 − 清远国防教育训练中心已交付并同扣 9 套 − 2026-09-15 阳山两单出库 14 套），存放口径为凯尔储运仓。</span></div>
+        <div class="status-row"><strong>项目锁定</strong><span>必须同时具备具体客户项目、型号数量、锁货/调拨/待发货的明确证据；否则归为“已知项目需求”，不可扣减仓库库存。当前锁定合计 43 套＝G860E 2P 挂机 37（广州海关 1＋GCXP/光明区建筑工务署 15＋茂名技师学院 21）＋G117U 1.5P 挂机 6（沙园 1＋茂名 5）；其中茂名按 DEC-20260915-01「合同已出待签即锁」于生成合同当次锁定。</span></div>
+        <div class="status-row"><strong>缺口与黄色标记</strong><span>锁货后逐型号核验「锁后可用量不为负」；出现负数的型号在看板中以黄色标记（柱底黄框、表格黄色底纹、「库存缺口 N 套」标签），并立即向广东一凌确认可调库存。当前唯一缺口：G860E 2P 挂机 −1 套（凯尔口径 −2）。</span></div>
         <div class="status-row"><strong>后续订单处理</strong><span>收到新订单后，先按型号核对“已发货、已签收、已取消”数量，再关联客户项目；仅合同待签或报价中，默认不改锁定数，除非收到明确的内部锁货指令。</span></div>
       </div>
       <details><summary>数据来源与核对口径</summary>
@@ -150,6 +158,7 @@
           <li><code>外仓库存管理表（9 月份，2026-09-15 14:48 更新）</code>：凯尔仓按完整型号核对的入出与盘点记录；方柜 2P/3P 各 10 于 9-2/9-3 入仓；G117U 1P、G888J 与项目锁定一致（可用 23、18）。9-15 出库两单共 14 套 G860E（YLGS-26090558 阳山秤架 13 套、YLGS-26090556〔编号待核〕1 套），已同扣仓库 50→36；凯尔核对表期末仍为 372 内机（未含 9-15 出库），以一凌凯尔仓出入库列＋出库明细为准。</li>
           <li>G860E 2P 挂机 9-5 出库 1 台：经确认为<strong>运输损坏件</strong>，待回收后补送新机——不属于客户项目锁货，不与广州海关技术中心等任何项目关联；沿用「损坏件不预扣」口径，仓库按 50−14＝36 计（未再扣这 1 台），待替换机实际出库后按外仓表出库记录更新。</li>
           <li>沙园街道办合同 YLGS-26090574（2026-09-15 我方出 doc，待签）：按 DEC-20260915-01「合同已出待签即锁」对 G117U 1.5P 挂机锁 1 套；阳山秤架 13 套、阳山医保 1 套 9-15 出库交付，锁定释放并同扣仓库（可用量不虚减）。</li>
+          <li><code>客户项目/茂名技师学院/03_合同/2026-09-16_空调采购合同_茂名技师学院.docx</code>（2026-09-16 我方出，无章待签；合同编号留空、甲方要素待补）：设备款 85,450 元＝1.5P 挂机 <code>KFR-35GW/G117U-X1</code>×5 @2,390 ＋ 2P 挂机 <code>KFR-50GW/G860E-X1</code>×21 @3,500，单价沿用本客户 2026-09-08 报价；按 DEC-20260915-01 于生成当次锁定 G860E 21 套＋G117U 1.5P 5 套。⚠ 该 21 套使 G860E 由可用 20 变为 <strong>−1（缺口 1 套）</strong>，按用户 2026-09-16 指令「锁 21 台，不足的用黄色标记」如实登记、不隐瞒，缺口补货去向见 Next-Actions。</li>
           <li><code>业务资料/01_政策授权与渠道/8.29一凌库存表发送(2).xlsx</code>：良品库存期末库存与已签收数量对应。</li>
           <li><code>业务资料/02_产品与技术资料/常用机型资料/图片介绍KFR-72LWG888J-X1A.png</code>：圆柱柜机；<code>图片介绍KFR-72LWG872C-X2.png</code>：方形柜机。</li>
           <li><code>客户项目/清远市国防教育训练中心/02_报价单/2026-08-26_海信空调报价单_清远市国防教育训练中心.pdf</code>：锁定需求 G117U 1P 挂机 2 套、G888J 3P 圆柱柜机 7 套；2026-08-31 用户明确内部锁货。</li>
@@ -161,8 +170,8 @@
   <script>
     const models = [
       { model: 'KFR-26GW/G117U-X1', hp: '1P', type: '挂机', shape: '不适用', warehouse: 23, transit: 0, locked: 0 },
-      { model: 'KFR-35GW/G117U-X1', hp: '1.5P', type: '挂机', shape: '不适用', warehouse: 50, transit: 0, locked: 1 },
-      { model: 'KFR-50GW/G860E-X1', hp: '2P', type: '挂机', shape: '不适用', warehouse: 36, transit: 0, locked: 16 },
+      { model: 'KFR-35GW/G117U-X1', hp: '1.5P', type: '挂机', shape: '不适用', warehouse: 50, transit: 0, locked: 6 },
+      { model: 'KFR-50GW/G860E-X1', hp: '2P', type: '挂机', shape: '不适用', warehouse: 36, transit: 0, locked: 37 },
       { model: 'KFR-72GW/G860U-X1', hp: '3P', type: '挂机', shape: '不适用', warehouse: 25, transit: 0, locked: 0 },
       { model: 'KFR-72LW/G888J-X1A', hp: '3P', type: '柜机', shape: '圆柱柜机', warehouse: 18, transit: 0, locked: 0 },
       { model: 'KFR-50LW/G872C-X2', hp: '2P', type: '柜机', shape: '方形柜机', warehouse: 10, transit: 0, locked: 0 },
@@ -183,8 +192,10 @@
       const shape = document.getElementById('shapeFilter').value;
       const rows = models.filter((item) => (status === 'all' || (status === 'warehouse' ? item.warehouse > 0 : item.transit > 0)) && (type === 'all' || item.type === type) && (shape === 'all' || item.shape === shape));
       document.getElementById('modelRows').innerHTML = rows.map((item) => {
-        const statusPills = [item.warehouse && '<span class="pill warehouse">仓库有货</span>', item.transit && '<span class="pill transit">在途</span>', item.locked && '<span class="pill locked">项目锁定</span>'].filter(Boolean).join(' ') || '<span class="pill unknown">待补数据</span>';
-        return `<tr><td>${item.model}</td><td>${item.hp}</td><td>${item.type}</td><td>${item.shape}</td><td class="number">${item.warehouse}</td><td class="number">${item.transit}</td><td class="number">${item.locked}</td><td class="number"><strong>${item.warehouse - item.locked}</strong></td><td>${statusPills}</td></tr>`;
+        const available = item.warehouse - item.locked;
+        const statusPills = [item.warehouse && '<span class="pill warehouse">仓库有货</span>', item.transit && '<span class="pill transit">在途</span>', item.locked && '<span class="pill locked">项目锁定</span>', available < 0 && `<span class="pill short">库存缺口 ${-available} 套</span>`].filter(Boolean).join(' ') || '<span class="pill unknown">待补数据</span>';
+        const availCell = available < 0 ? `<td class="number cell-short"><strong>${available}</strong></td>` : `<td class="number"><strong>${available}</strong></td>`;
+        return `<tr><td>${item.model}</td><td>${item.hp}</td><td>${item.type}</td><td>${item.shape}</td><td class="number">${item.warehouse}</td><td class="number">${item.transit}</td><td class="number">${item.locked}</td>${availCell}<td>${statusPills}</td></tr>`;
       }).join('');
     };
     document.querySelectorAll('select').forEach((select) => select.addEventListener('change', renderRows));
@@ -228,10 +239,28 @@
         { key: 'locked', color: '#b42318', label: '项目锁定' }
       ];
       const barWidth = Math.min(58, (plotWidth / models.length) * 0.55);
+      // 缺口型号（锁后可用为负）整根柱加浅黄底，先画底、后画柱，避免遮住柱体
+      models.forEach((item, index) => {
+        if (item.warehouse - item.locked < 0) {
+          append('rect', {
+            x: x(index) - barWidth / 2 - 9,
+            y: margin.top,
+            width: barWidth + 18,
+            height: plotHeight,
+            rx: 4,
+            fill: '#fff4cc',
+            stroke: '#d9a300',
+            'stroke-width': 1.5,
+            'stroke-dasharray': '5 4'
+          });
+        }
+      });
       models.forEach((item, index) => {
         let stackedValue = 0;
         series.forEach((seriesItem) => {
-          const value = seriesItem.key === 'available' ? item.warehouse - item.locked : item[seriesItem.key];
+          const value = seriesItem.key === 'available'
+            ? Math.max(item.warehouse - item.locked, 0)   // 可用为负时不画负高柱，改由黄底＋缺口字样标记
+            : item[seriesItem.key];
           const segmentBottom = stackedValue;
           stackedValue += value;
           const segmentHeight = y(segmentBottom) - y(stackedValue);
@@ -269,11 +298,13 @@
         shape.setAttribute('x', x(index));
         shape.setAttribute('dy', 17);
         shape.textContent = item.shape === '不适用' ? '' : item.shape;
+        const available = item.warehouse - item.locked;
         const quantities = document.createElementNS(ns, 'tspan');
         quantities.setAttribute('x', x(index));
         quantities.setAttribute('dy', 17);
-        quantities.setAttribute('fill', '#1f7a5c');
-        quantities.textContent = `可用${item.warehouse - item.locked}`;
+        quantities.setAttribute('fill', available < 0 ? '#8a6d00' : '#1f7a5c');
+        if (available < 0) quantities.setAttribute('font-weight', '700');
+        quantities.textContent = `可用${available}`;
         const transit = document.createElementNS(ns, 'tspan');
         transit.setAttribute('fill', '#b45309');
         transit.textContent = `｜在${item.transit}`;
@@ -281,6 +312,15 @@
         locked.setAttribute('fill', '#b42318');
         locked.textContent = `｜锁${item.locked}`;
         label.append(first, second, classification, shape, quantities, transit, locked);
+        if (available < 0) {
+          const gap = document.createElementNS(ns, 'tspan');
+          gap.setAttribute('x', x(index));
+          gap.setAttribute('dy', 17);
+          gap.setAttribute('fill', '#8a6d00');
+          gap.setAttribute('font-weight', '700');
+          gap.textContent = `⚠库存缺口${-available}`;
+          label.append(gap);
+        }
       });
     };
     renderInventoryChart();
