@@ -57,9 +57,10 @@
     .chart-label { fill:var(--muted); font-size:12px; }
     .chart-segment-value { fill:#fff; font-size:12px; font-weight:700; }
     .chart-segment-value-small { fill:var(--red); font-size:12px; font-weight:700; }
-    /* 缺口段（黄柱）：白字在黄底上看不清，单独给深琥珀字；柱身太薄时数字移到柱顶上方 */
+    /* 缺口段（黄柱）：白字在黄底上看不清，单独给深琥珀字；柱身太薄时数字移到柱右侧 */
     .chart-segment-value-dark { fill:#6b4e00; font-size:12px; font-weight:700; }
-    .chart-segment-value-warn { fill:#8a6d00; font-size:12px; font-weight:700; }
+    /* 段太薄、数字放不进柱内时，数字挪到柱子右侧：白描边（paint-order:stroke）保证压在网格线上也读得清 */
+    .chart-segment-value-side { font-size:12.5px; font-weight:700; paint-order:stroke; stroke:#fff; stroke-width:3.5px; stroke-linejoin:round; }
     details { margin-top:14px; border-top:1px solid var(--line); padding-top:14px; color:#486581; font-size:13px; line-height:1.7; }
     summary { cursor:pointer; color:var(--blue); font-weight:650; }
     .source-list { margin:8px 0 0; padding-left:20px; }
@@ -211,7 +212,10 @@
       const svg = document.getElementById('inventoryChart');
       const ns = 'http://www.w3.org/2000/svg';
       const width = 960;
-      const height = 460;
+      // 2026-09-18 用户反馈「库存表不要太矮了，看不到 35GW/G117 红色的数字」——
+      // 原 height=460（绘图区仅 282px）时，仓库 50 套的型号 1 套锁定只有 5.6px，数字根本放不下。
+      // 现拉到 660（绘图区 482px）：1 套 ≈ 9.6px，柱体本身看得见，数字另有专门摆法（见下）。
+      const height = 660;
       const margin = { top: 28, right: 28, bottom: 150, left: 62 };
       const plotWidth = width - margin.left - margin.right;
       const plotHeight = height - margin.top - margin.bottom;
@@ -249,10 +253,10 @@
       models.forEach((item, index) => {
         const available = item.warehouse - item.locked;
         const segments = [
-          { color: '#1f7a5c', label: '锁后可用', value: Math.max(available, 0) },
-          { color: '#b45309', label: '在途库存', value: item.transit },
-          { color: '#b42318', label: '项目锁定', value: Math.min(item.locked, item.warehouse) },
-          { color: '#f2b705', label: '库存缺口', value: Math.max(-available, 0), stroke: '#a07d00', minHeight: 6, textClass: 'chart-segment-value-dark', smallTextClass: 'chart-segment-value-warn' }
+          { color: '#1f7a5c', sideColor: '#1f7a5c', label: '锁后可用', value: Math.max(available, 0) },
+          { color: '#b45309', sideColor: '#b45309', label: '在途库存', value: item.transit },
+          { color: '#b42318', sideColor: '#b42318', label: '项目锁定', value: Math.min(item.locked, item.warehouse) },
+          { color: '#f2b705', sideColor: '#8a6d00', label: '库存缺口', value: Math.max(-available, 0), stroke: '#a07d00', minHeight: 6, textClass: 'chart-segment-value-dark' }
         ];
         let stackedValue = 0;
         segments.forEach((segment) => {
@@ -276,9 +280,21 @@
           title.textContent = `${item.model}｜${segment.label}：${value} 套`;
           bar.appendChild(title);
           if (segmentHeight >= 16) {
+            // 段够高：数字写在段内居中
             append('text', { x: x(index), y: y(stackedValue) + segmentHeight / 2 + 4, 'text-anchor': 'middle', class: segment.textClass || 'chart-segment-value' }, value);
           } else {
-            append('text', { x: x(index), y: Math.max(margin.top + 12, y(stackedValue) - 5), 'text-anchor': 'middle', class: segment.smallTextClass || 'chart-segment-value-small' }, value);
+            // 段太薄（如 50 套里只锁 1 套）放不下数字：挪到柱子右侧、与段垂直居中，
+            // 并加白描边——压在网格线上也读得清。旧写法把数字往上顶，遇到柱顶贴到画布上沿时
+            // 会被 Math.max 往下推 12px、掉进下方的绿色柱里，这正是用户看不清的根因。
+            const sideY = y(stackedValue) + segmentHeight / 2 + 4;
+            append('text', {
+              x: x(index) + barWidth / 2 + 5,
+              y: Math.min(Math.max(sideY, margin.top + 11), margin.top + plotHeight),
+              'text-anchor': 'start',
+              class: 'chart-segment-value-side',
+              fill: segment.sideColor || segment.color,
+              'paint-order': 'stroke'
+            }, value);
           }
         });
       });
@@ -302,6 +318,8 @@
         shape.setAttribute('dy', 17);
         shape.textContent = item.shape === '不适用' ? '' : item.shape;
         const available = item.warehouse - item.locked;
+        // 「可用X｜在Y｜锁Z」原来挤成一行，8 个型号并排时相邻两列首尾相连（如「锁0可用49」糊在一起）。
+        // 2026-09-18 拆成两行：第 1 行「可用X」，第 2 行「在Y｜锁Z」——单行最长约 6 字，不会再撞。
         const quantities = document.createElementNS(ns, 'tspan');
         quantities.setAttribute('x', x(index));
         quantities.setAttribute('dy', 17);
@@ -309,8 +327,10 @@
         if (available < 0) quantities.setAttribute('font-weight', '700');
         quantities.textContent = `可用${available}`;
         const transit = document.createElementNS(ns, 'tspan');
+        transit.setAttribute('x', x(index));      // 设 x ＝ 另起一行
+        transit.setAttribute('dy', 16);
         transit.setAttribute('fill', '#b45309');
-        transit.textContent = `｜在${item.transit}`;
+        transit.textContent = `在${item.transit}`;
         const locked = document.createElementNS(ns, 'tspan');
         locked.setAttribute('fill', '#b42318');
         locked.textContent = `｜锁${item.locked}`;
