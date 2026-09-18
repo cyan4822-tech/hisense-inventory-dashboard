@@ -72,12 +72,12 @@
   <main>
     <header>
       <h1>一凌库存状态看板</h1>
-      <p class="sub">数据截止：2026-09-17 17:00（外仓表 9-17 14:01 更新，出入库记录至 9-17）｜ 锁定更新：2026-09-17 17:00（YLGS-26090556 广州海关技术中心签署件到档：G860E 1 套已于 9-17 出库交付，锁定释放、仓库 36→35 同扣）｜ 采购订单：2026-08-21 ｜ 仓库签收快照：2026-09-17（凯尔仓，含 9-2/9-3 入仓方柜 20 套；9-15 出库 14 套、9-17 出库 1 套 G860E 均已同扣仓库）</p>
+      <p class="sub">数据截止：2026-09-17 17:00（外仓表 9-17 14:01 更新，出入库记录至 9-17）｜ 锁定更新：2026-09-17 17:00（YLGS-26090556 广州海关技术中心签署件到档：G860E 1 套已于 9-17 出库交付，锁定释放、仓库 36→35 同扣）｜ 采购订单：2026-08-21 ｜ <strong>在途刷新：2026-09-18（购货申请单 <code>20260916.xls</code> 新增 G860E 30 台，在途 0→30）</strong> ｜ 仓库签收快照：2026-09-17（凯尔仓，含 9-2/9-3 入仓方柜 20 套；9-15 出库 14 套、9-17 出库 1 套 G860E 均已同扣仓库）</p>
     </header>
 
     <section>
       <h2>各型号库存对比</h2>
-      <p class="section-note">每个型号为一根堆叠柱；绿色为扣除锁定后的仓库可用量，红色锁定由同一批仓库库存划出，橙色为在途。坐标框内同时列出完整型号、匹数、挂机/柜机及适用时的圆柱/方形外观。</p>
+      <p class="section-note">每个型号为一根堆叠柱；绿色为扣除锁定后的仓库可用量，红色锁定由同一批仓库库存划出，橙色为在途（已订未签收）。坐标框内同时列出完整型号、匹数、挂机/柜机及适用时的圆柱/方形外观。</p>
       <div class="chart-legend" aria-label="图例">
         <span class="legend-item" style="color:var(--green)"><i class="legend-line"></i>锁后可用</span>
         <span class="legend-item" style="color:var(--orange)"><i class="legend-line"></i>在途库存</span>
@@ -87,11 +87,11 @@
       <div class="chart-scroll"><svg id="inventoryChart" role="img" aria-label="各型号仓库、在途和项目锁定数量堆叠柱状图"></svg></div>
     </section>
 
-    <div class="notice"><strong>使用边界：</strong>“仓库库存”来自 B2B 订单的已签收数量；“在途”= 已发货未签收；“项目锁定”只在有明确项目名称及锁货/调拨/发货指令时扣减。锁货口径（2026-09-15 起，DEC-20260915-01）：<strong>我方生成/定稿合同文档即视为要货确认、可据此锁库存</strong>；仅口头、报备中或未出合同文档的仍按“已知项目需求”不锁。锁后须逐型号核验可用量不为负，出现缺口的型号以黄色标记。本看板仅按已明确的内部锁货指令扣减，实体仓冻结或调拨仍须由广东一凌落实。</div>
+    <div class="notice"><strong>使用边界：</strong>“仓库库存”来自 B2B 订单的已签收数量；“在途”= 已订未签收（含“已发货未签收”与“已下单/已申请未发货”两类，2026-09-18 起）。“项目锁定”只在有明确项目名称及锁货/调拨/发货指令时扣减。锁货口径（2026-09-15 起，DEC-20260915-01）：<strong>我方生成/定稿合同文档即视为要货确认、可据此锁库存</strong>；仅口头、报备中或未出合同文档的仍按“已知项目需求”不锁。锁后须逐型号核验可用量不为负，出现缺口的型号以黄色标记。本看板仅按已明确的内部锁货指令扣减，实体仓冻结或调拨仍须由广东一凌落实。</div>
 
     <div class="kpis" id="kpis"></div>
 
-    <div class="short-note"><strong>⚠ 库存缺口（黄色标记）：当前 2 个型号</strong><br><strong>① 2P 挂机 <code>KFR-50GW/G860E-X1</code></strong>：仓库 35 套、已锁定 36 套 → 可用 <strong>−1 套</strong>（凯尔口径 −2：仓库 34、锁定 36）。缺口 1 套来自<strong>茂名技师学院</strong>合同（2026-09-16 我方已出、待签，2P 挂机 21 台）——按用户 2026-09-16 明确指令「锁 21 台，不足的用黄色标记」登记，不隐瞒缺口。补货去向：向广东一凌（蔡阳）确认可调库存，或等 9-5 运输损坏件替换机到货后按外仓表出库记录回填。<br><strong>② 1.5P 科龙挂机 <code>KFR-35GW/GK1U-X1</code></strong>：<strong>外仓无此型号</strong>（凯尔仓「套机型号」表仅 7 项且全为海信，无科龙机型），我方库存 0 套、茂名技师学院需求 5 套 → 可用 <strong>−5 套</strong>。该型号经用户 2026-09-16 向客户核实确认为<strong>科龙</strong>（单价同步改为集采入围价 2,290 元/套），<strong>须向广东一凌/厂家另行订货解决，不占用外仓现有库存</strong>。</div>
+    <div class="short-note"><strong>⚠ 库存缺口（黄色标记）：当前 2 个型号</strong><br><strong>① 2P 挂机 <code>KFR-50GW/G860E-X1</code></strong>：仓库 35 套、已锁定 36 套 → 可用 <strong>−1 套</strong>（凯尔口径 −2：仓库 34、锁定 36）。缺口 1 套来自<strong>茂名技师学院</strong>合同（2026-09-16 我方已出、待签，2P 挂机 21 台）——按用户 2026-09-16 明确指令「锁 21 台，不足的用黄色标记」登记，不隐瞒缺口。补货去向：向广东一凌（蔡阳）确认可调库存，或等 9-5 运输损坏件替换机到货后按外仓表出库记录回填。<strong>✅ 已锁定补货：2026-09-16 购货申请单（<code>20260916.xls</code>）已向海信申请该型号 <strong>30 台</strong>，已计入在途 30 套 —— 到仓后本缺口即闭合。</strong><br><strong>② 1.5P 科龙挂机 <code>KFR-35GW/GK1U-X1</code></strong>：<strong>外仓无此型号</strong>（凯尔仓「套机型号」表仅 7 项且全为海信，无科龙机型），我方库存 0 套、茂名技师学院需求 5 套 → 可用 <strong>−5 套</strong>。该型号经用户 2026-09-16 向客户核实确认为<strong>科龙</strong>（单价同步改为集采入围价 2,290 元/套），<strong>须向广东一凌/厂家另行订货解决，不占用外仓现有库存</strong>。</div>
 
     <section>
       <h2>按型号的库存归属</h2>
@@ -108,11 +108,12 @@
     </section>
 
     <section>
-      <h2>在途库存：0 套</h2>
-      <p class="section-note">原 BHO2601383185 的 20 套方形柜机（2P/3P 各 10）已于 2026-09-02 / 09-03 入仓签收，转入仓库库存；当前无在途。</p>
+      <h2>在途库存：30 套</h2>
+      <p class="section-note">在途＝<strong>已订未签收</strong>（口径 2026-09-18 起，见下方「使用边界」）。当前 30 套全部来自 2026-09-16 购货申请单（<code>20260916.xls</code>）：<code>KFR-50GW/G860E-X1</code> × 30 台，已申请待发货。原 BHO2601383185 的 20 套方形柜机（2P/3P 各 10）已于 2026-09-02 / 09-03 入仓签收，转入仓库库存。</p>
       <div class="table-wrap"><table>
         <thead><tr><th>采购订单号</th><th>型号</th><th>分类</th><th class="number">到仓数量</th><th>到仓日期</th><th>状态</th></tr></thead>
         <tbody>
+          <tr><td>—（20260916.xls 购货申请单）</td><td>KFR-50GW/G860E-X1</td><td>2P｜挂机</td><td class="number">30</td><td>待定</td><td><span class="pill transit">已申请待发货（在途）</span></td></tr>
           <tr><td>BHO2601383185</td><td>KFR-50LW/G872C-X2</td><td>2P｜柜机｜方形柜机</td><td class="number">10</td><td>2026-09-02</td><td><span class="pill warehouse">已签收入仓</span></td></tr>
           <tr><td>BHO2601383185</td><td>KFR-72LW/G872C-X2</td><td>3P｜柜机｜方形柜机</td><td class="number">10</td><td>2026-09-03</td><td><span class="pill warehouse">已签收入仓</span></td></tr>
         </tbody>
@@ -151,15 +152,17 @@
     <section>
       <h2>状态维护规则</h2>
       <div class="status-list">
-        <div class="status-row"><strong>在途库存</strong><span>本次为 0 套；原 20 套方形柜机（G872C 2P/3P 各 10）已于 2026-09-02/09-03 入仓签收，转入仓库库存。</span></div>
+        <div class="status-row"><strong>在途库存</strong><span><strong>本次为 30 套</strong>（口径 2026-09-18 起＝「已订未签收」，含已发货未签收＋已下单/已申请未发货）：全部为 <code>KFR-50GW/G860E-X1</code> × 30 台，来自 2026-09-16 购货申请单 <code>20260916.xls</code>（已申请待发货，无 CIMS 单号、未签章）。原 20 套方形柜机（G872C 2P/3P 各 10）已于 2026-09-02/09-03 入仓签收，转入仓库库存。</span></div>
         <div class="status-row"><strong>仓库库存</strong><span>B2B 订单“已签收数量”或仓库盘点已确认的数量。本次为 171 套（原 195 套 − 清远国防教育训练中心已交付并同扣 9 套 − 2026-09-15 阳山两单出库 14 套 − 2026-09-17 广州海关技术中心出库 1 套），存放口径为凯尔储运仓。</span></div>
         <div class="status-row"><strong>项目锁定</strong><span>必须同时具备具体客户项目、型号数量、锁货/调拨/待发货的明确证据；否则归为“已知项目需求”，不可扣减仓库库存。当前锁定合计 42 套＝G860E 2P 挂机 36（GCXP/光明区建筑工务署 15＋茂名技师学院 21）＋G117U 1.5P 挂机 1（沙园 1）＋GK1U 1.5P 挂机 5（茂名 5，科龙机型、外仓无货）。广州海关技术中心 1 套已随 2026-09-17 出库交付释放锁定并同扣仓库。其中茂名按 DEC-20260915-01「合同已出待签即锁」于生成合同当次锁定；<strong>2026-09-16 核实 1.5P 为科龙 GK1U 后，其 1.5P 锁货对象由 G117U 改为 GK1U——释放 G117U 1.5P 5 套、新增 GK1U 1.5P 5 套</strong>，锁定总数与可用量不变。</span></div>
-        <div class="status-row"><strong>缺口与黄色标记</strong><span>锁货后逐型号核验「锁后可用量不为负」；出现负数的型号在看板中以黄色标记（<strong>柱顶一截黄色柱段，柱上的数字就是缺口台数</strong>——黄柱写 1 即「还差 1 台」；另有表格黄色底纹与「库存缺口 N 套」标签），并立即向广东一凌确认可调库存。当前缺口 <strong>2 个型号</strong>：G860E 2P 挂机 <strong>−1 套</strong>（凯尔口径 −2，茂名 21 台需求超出可用；9-17 海关技术中心交付后锁定与仓库各减 1、缺口值不变）、科龙 GK1U 1.5P 挂机 <strong>−5 套</strong>（外仓无此型号，茂名 5 台需求，须另行订货）。</span></div>
+        <div class="status-row"><strong>缺口与黄色标记</strong><span>锁货后逐型号核验「锁后可用量不为负」；出现负数的型号在看板中以黄色标记（<strong>柱顶一截黄色柱段，柱上的数字就是缺口台数</strong>——黄柱写 1 即「还差 1 台」；另有表格黄色底纹与「库存缺口 N 套」标签），并立即向广东一凌确认可调库存。当前缺口 <strong>2 个型号</strong>：G860E 2P 挂机 <strong>−1 套</strong>（凯尔口径 −2，茂名 21 台需求超出可用；9-17 海关技术中心交付后锁定与仓库各减 1、缺口值不变；<strong>已在途 30 套覆盖，到仓后闭合</strong>）、科龙 GK1U 1.5P 挂机 <strong>−5 套</strong>（外仓无此型号，茂名 5 台需求，<strong>仍无订货单，须另行订货</strong>）。</span></div>
         <div class="status-row"><strong>后续订单处理</strong><span>收到新订单后，先按型号核对“已发货、已签收、已取消”数量，再关联客户项目；仅合同待签或报价中，默认不改锁定数，除非收到明确的内部锁货指令。</span></div>
       </div>
       <details><summary>数据来源与核对口径</summary>
         <ul class="source-list">
           <li><code>业务资料/01_政策授权与渠道/B2B 订单明细(20260831-110259).xlsx</code>：订单 BHO2601383185，7 个型号共采购 195 套；2026-09-08 前已全部签收入仓（175＋方柜 20），在途 0。</li>
+          <li><code>业务资料/01_政策授权与渠道/20260916.xls</code>（<strong>购货申请单</strong>，2026-09-18 到档）：<code>KFR-50GW/G860E-X1</code> × <strong>30 台</strong>，申请日期 2026-09-16，种类「批发√」，供应商「青岛海信空调营销股份有限公司」，无 CIMS 单号、未签章 → <strong>已申请待发货，计入在途 30 套</strong>。登记见 <code>业务资料/01_政策授权与渠道/订货单索引.md</code> OD-02。</li>
+          <li><code>业务资料/01_政策授权与渠道/20260821.xls</code>（<strong>购货申请单</strong>，2026-09-18 到档）：即订单 BHO2601383185 的申请原件（7 型号 195 台、总额 498,500 元），与上条 B2B 导出件为<strong>同一批货，不重复计在途</strong>。登记见 <code>订货单索引.md</code> OD-01a。</li>
           <li><code>外仓库存管理表（9 月份，2026-09-17 14:01 更新）</code>：凯尔仓按完整型号核对的入出与盘点记录；方柜 2P/3P 各 10 于 9-2/9-3 入仓；G117U 1P、G888J 与项目锁定一致（可用 23、18）。9-15 出库两单共 14 套 G860E（YLGS-26090558 阳山秤架 13 套、YLGS-26090557/YLGS-26090556 1 套），9-17 出库 1 套 G860E（YLGS-26090556＝广州海关技术中心），已同扣仓库 50→35；凯尔核对表期末仍为 372 内机（未含 9-15/9-17 出库），以一凌凯尔仓出入库列＋出库明细为准；表底快照标签仍为「16号库存 342」（未随 9-17 出库刷新，按既定结论不作独立口径）。</li>
           <li>G860E 2P 挂机 9-5 出库 1 台：经确认为<strong>运输损坏件</strong>，待回收后补送新机——不属于客户项目锁货，不与广州海关技术中心等任何项目关联；沿用「损坏件不预扣」口径，仓库按 50−14−1＝35 计（2026-09-17 海关技术中心 1 套出库后；仍未再扣这 1 台），待替换机实际出库后按外仓表出库记录更新。</li>
           <li>沙园街道办合同 YLGS-26090574（2026-09-15 我方出 doc，待签）：按 DEC-20260915-01「合同已出待签即锁」对 G117U 1.5P 挂机锁 1 套；阳山秤架 13 套、阳山医保 1 套 9-15 出库交付，锁定释放并同扣仓库（可用量不虚减）。</li>
@@ -178,7 +181,7 @@
       { model: 'KFR-26GW/G117U-X1', hp: '1P', type: '挂机', shape: '不适用', warehouse: 23, transit: 0, locked: 0 },
       { model: 'KFR-35GW/G117U-X1', hp: '1.5P', type: '挂机', shape: '不适用', warehouse: 50, transit: 0, locked: 1 },
       { model: 'KFR-35GW/GK1U-X1', hp: '1.5P', type: '挂机', shape: '不适用', warehouse: 0, transit: 0, locked: 5 },
-      { model: 'KFR-50GW/G860E-X1', hp: '2P', type: '挂机', shape: '不适用', warehouse: 35, transit: 0, locked: 36 },
+      { model: 'KFR-50GW/G860E-X1', hp: '2P', type: '挂机', shape: '不适用', warehouse: 35, transit: 30, locked: 36 },
       { model: 'KFR-72GW/G860U-X1', hp: '3P', type: '挂机', shape: '不适用', warehouse: 25, transit: 0, locked: 0 },
       { model: 'KFR-72LW/G888J-X1A', hp: '3P', type: '柜机', shape: '圆柱柜机', warehouse: 18, transit: 0, locked: 0 },
       { model: 'KFR-50LW/G872C-X2', hp: '2P', type: '柜机', shape: '方形柜机', warehouse: 10, transit: 0, locked: 0 },
@@ -187,7 +190,7 @@
     const total = (key) => models.reduce((sum, item) => sum + item[key], 0);
     const kpiItems = [
       ['仓库库存', total('warehouse'), '已签收，可调配'],
-      ['在途库存', total('transit'), '当前无在途'],
+      ['在途库存', total('transit'), '已订未签收（含已下单未发货）'],
       ['项目锁定', total('locked'), '有明确锁货证据才扣减'],
       ['当前可用', total('warehouse') - total('locked'), '仓库库存 - 已锁定']
     ];
