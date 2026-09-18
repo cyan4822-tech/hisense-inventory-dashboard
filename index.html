@@ -29,6 +29,11 @@
     select { margin-left:6px; padding:7px 9px; color:var(--ink); background:#fff; border:1px solid var(--line); border-radius:6px; }
     .table-wrap { overflow-x:auto; }
     table { width:100%; border-collapse:collapse; font-size:14px; }
+    /* 项目类表格：项目名称列不得被挤窄或折行（2026-09-18 用户反馈「看不清项目名称，太短了」）。
+       这两张表一律上下堆叠、整幅宽度，不再左右并排——并排时每张只有半屏，项目名被压到读不出。 */
+    table.project-table th:first-child, table.project-table td:first-child { white-space:nowrap; padding-right:18px; }
+    table.project-table th:nth-child(2), table.project-table td:nth-child(2) { white-space:nowrap; padding-right:18px; }
+    table.project-table td:first-child { font-weight:600; }
     th { padding:11px 10px; color:#fff; background:var(--ink); text-align:left; white-space:nowrap; }
     td { padding:11px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
     tbody tr:hover { background:#f8fbfd; }
@@ -120,11 +125,11 @@
       </table></div>
     </section>
 
-    <section class="grid-two">
+    <section>
       <div>
         <h2>项目锁定</h2>
         <p class="section-note">仅登记已被具体项目占用、不能再对外调配的数量。</p>
-        <div class="table-wrap"><table>
+        <div class="table-wrap"><table class="project-table">
           <thead><tr><th>项目</th><th>型号与数量</th><th>锁后可调配</th><th>状态</th></tr></thead>
         <tbody>
           <tr><td>清远市国防教育训练中心</td><td>G117U 1P 挂机 2；G888J 3P 圆柱柜机 7</td><td>已全部交付并回款（2026-09-11），锁定已释放</td><td><span class="pill warehouse">已闭环释放</span><br>9 套货已交付，内部锁定清零；仓库数已同扣 25→23 / 25→18</td></tr>
@@ -133,14 +138,14 @@
           <tr><td>广州海关技术中心</td><td>G860E 2P 挂机 1</td><td><span class="pill short">G860E：−1（一凌口径）/ −2（凯尔口径）</span></td><td><span class="pill warehouse">已签署并交付释放</span><br>合同 YLGS-26090556 签署件 2026-09-17 到档（共享盘扫描件：甲方广州海关技术中心、乙方广州一凌，海信 <code>KFR-50GW</code>×1 @3,500＝3,500 元，甲乙双方盖章齐全、签订日期 2026-09-09）；外仓出库明细 2026-09-17 出库 1 套 G860E 即该单交付——硬锁 1 套释放、仓库 36→35 同扣（沿用清远交付口径：货出库即同扣仓库并清锁定）。原锁为 2026-09-15 用户指令「合同中，这个也锁」所设</td></tr>
           <tr><td>GCXP空调（深圳市光明区建筑工务署）</td><td>G860E 2P 挂机 15</td><td><span class="pill short">G860E：−1（一凌口径）/ −2（凯尔口径）</span></td><td><span class="pill locked">硬锁 15 套</span><br>2026-09-15 用户明确指令"锁一下库存，自己内部项目"；报备跟进人 广东一凌·蔡阳、报备时间 2026-09-15，按用户指令即时硬锁（报备项目，尚未出合同 doc/pdf）</td></tr>
           <tr><td>广州市海珠区沙园街道办事处</td><td>G117U 1.5P 挂机 1</td><td>G117U 1.5P：49</td><td><span class="pill locked">硬锁 1 套</span><br>合同 YLGS-26090574 我方 2026-09-15 已出 doc（1.5P 挂机×1 @2,390＋辅材 1,980＝4,370 元，无章待签）；每日刷新按 DEC-20260915-01「合同已出待签即锁」兜底补锁</td></tr>
-          <tr><td>茂名技师学院</td><td>G860E 2P 挂机 21；<strong>GK1U 1.5P 挂机 5（科龙）</strong></td><td><span class="pill short">G860E：−1（一凌口径）/ −2（凯尔口径）</span>；<span class="pill short">GK1U 1.5P：−5（外仓无此型号）</span>；G117U 1.5P：49</td><td><span class="pill short">硬锁 26 套（含缺口 6：G860E 1＋GK1U 5）</span><br>合同 `2026-09-16_空调采购合同_茂名技师学院.docx` 我方 2026-09-16 已出（合同编号 <strong>YLGS-26090579</strong>、甲方要素已补（仅收货人待补），无章待签，设备款 <strong>84,950 元</strong>＝1.5P×5 @2,290（<strong>科龙 <code>KFR-35GW/GK1U-X1</code></strong>）＋2P×21 @3,500）；按 DEC-20260915-01 当次会话即时锁货。<strong>1.5P 型号经用户 2026-09-16 向客户核实为科龙 GK1U</strong>（原填海信 G117U 有误，已更正并重出合同），单价按集采入围价 2,290；<strong>GK1U 外仓无货，5 套须另行订货</strong>。2P 挂机锁 21 套后 G860E 可用 −1（缺口 1 套），按用户「锁 21 台，不足的用黄色标记」登记，待向一凌确认可调库存/替换机到货后补齐</td></tr>
+          <tr><td>茂名技师学院</td><td>G860E 2P 挂机 21；<strong>GK1U 1.5P 挂机 5（科龙）</strong></td><td><span class="pill short">G860E：−1（一凌口径）/ −2（凯尔口径）</span>；<span class="pill short">GK1U 1.5P：−5（外仓无此型号）</span>；G117U 1.5P：49</td><td><span class="pill short">硬锁 26 套（含缺口 6：G860E 1＋GK1U 5）</span><br>合同 <code>2026-09-16_空调采购合同_茂名技师学院.docx</code> 我方 2026-09-16 已出（合同编号 <strong>YLGS-26090579</strong>、甲方要素已补（仅收货人待补），无章待签，设备款 <strong>84,950 元</strong>＝1.5P×5 @2,290（<strong>科龙 <code>KFR-35GW/GK1U-X1</code></strong>）＋2P×21 @3,500）；按 DEC-20260915-01 当次会话即时锁货。<strong>1.5P 型号经用户 2026-09-16 向客户核实为科龙 GK1U</strong>（原填海信 G117U 有误，已更正并重出合同），单价按集采入围价 2,290；<strong>GK1U 外仓无货，5 套须另行订货</strong>。2P 挂机锁 21 套后 G860E 可用 −1（缺口 1 套），按用户「锁 21 台，不足的用黄色标记」登记，待向一凌确认可调库存/替换机到货后补齐</td></tr>
         </tbody>
         </table></div>
       </div>
-      <div>
+      <div style="margin-top:26px">
         <h2>其他已知项目需求（不扣库存）</h2>
         <p class="section-note">这些是机会或待签合同，尚无明确锁货指令。</p>
-        <div class="table-wrap"><table>
+        <div class="table-wrap"><table class="project-table">
           <thead><tr><th>项目</th><th>型号与数量</th><th>当前阶段</th></tr></thead>
           <tbody>
             <tr><td>广州市白云区人民检察院</td><td>3P 挂机 G860U 3</td><td><span class="pill unknown">失单（2026-09-10 确认，已与别家合作）</span></td></tr>
