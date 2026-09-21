@@ -84,7 +84,7 @@
 
     <section>
       <h2>各型号库存对比</h2>
-      <p class="section-note">每个型号为一根堆叠柱；绿色为扣除锁定后的仓库可用量，黄色锁定由同一批仓库库存划出，浅绿色为在途（已订未签收，即已下单/已发货仍运输中）。坐标框内同时列出完整型号、匹数、挂机/柜机及适用时的圆柱/方形外观。</p>
+      <p class="section-note">每个型号为一根堆叠柱；绿色为扣除锁定后的仓库可用量，黄色为从同一批仓库库存划出的项目锁定，蓝色为经调货到位入册的库存（科龙 GK1U，仍占茂名技师学院），浅绿色为在途（已订未签收，即已下单/已发货仍运输中）。坐标框内同时列出完整型号、匹数、挂机/柜机及适用时的圆柱/方形外观。</p>
       <div class="chart-legend" aria-label="图例">
         <span class="legend-item" style="color:var(--green)"><i class="legend-line"></i>锁后可用</span>
         <span class="legend-item" style="color:var(--green-light-text)"><i class="legend-line" style="background:var(--green-light)"></i>在途库存（浅绿）</span>
@@ -198,7 +198,8 @@
     const models = [
       { model: 'KFR-26GW/G117U-X1', hp: '1P', type: '挂机', shape: '不适用', warehouse: 23, transit: 0, locked: 0 },
       { model: 'KFR-35GW/G117U-X1', hp: '1.5P', type: '挂机', shape: '不适用', warehouse: 50, transit: 0, locked: 1 },
-      { model: 'KFR-35GW/GK1U-X1', hp: '1.5P', type: '挂机', shape: '不适用', warehouse: 5, transit: 0, locked: 5 },
+      // 科龙 GK1U：5 套经广东一凌/厂家调货到位入册（2026-09-21）。transfer 记调货量，图中以蓝色段显示（DEC-20260921-03 / 06）。
+      { model: 'KFR-35GW/GK1U-X1', hp: '1.5P', type: '挂机', shape: '不适用', warehouse: 5, transit: 0, locked: 5, transfer: 5 },
       { model: 'KFR-50GW/G860E-X1', hp: '2P', type: '挂机', shape: '不适用', warehouse: 14, transit: 30, locked: 15 },
       { model: 'KFR-72GW/G860U-X1', hp: '3P', type: '挂机', shape: '不适用', warehouse: 25, transit: 0, locked: 0 },
       { model: 'KFR-72LW/G888J-X1A', hp: '3P', type: '柜机', shape: '圆柱柜机', warehouse: 18, transit: 0, locked: 0 },
@@ -221,7 +222,7 @@
       const rows = models.filter((item) => (status === 'all' || (status === 'warehouse' ? item.warehouse > 0 : item.transit > 0)) && (type === 'all' || item.type === type) && (shape === 'all' || item.shape === shape));
       document.getElementById('modelRows').innerHTML = rows.map((item) => {
         const available = item.warehouse - item.locked;
-        const statusPills = [item.warehouse && '<span class="pill warehouse">仓库有货</span>', item.transit && '<span class="pill transit">在途</span>', item.locked && '<span class="pill locked">项目锁定</span>', available < 0 && `<span class="pill short">库存缺口 ${-available} 套</span>`].filter(Boolean).join(' ') || '<span class="pill unknown">待补数据</span>';
+        const statusPills = [item.warehouse && '<span class="pill warehouse">仓库有货</span>', item.transfer && '<span class="pill transfer">调货（已到位）</span>', item.transit && '<span class="pill transit">在途</span>', item.locked && '<span class="pill locked">项目锁定</span>', available < 0 && `<span class="pill short">库存缺口 ${-available} 套</span>`].filter(Boolean).join(' ') || '<span class="pill unknown">待补数据</span>';
         const availCell = available < 0 ? `<td class="number cell-short"><strong>${available}</strong></td>` : `<td class="number"><strong>${available}</strong></td>`;
         return `<tr><td>${item.model}</td><td>${item.hp}</td><td>${item.type}</td><td>${item.shape}</td><td class="number">${item.warehouse}</td><td class="number">${item.transit}</td><td class="number">${item.locked}</td>${availCell}<td>${statusPills}</td></tr>`;
       }).join('');
@@ -273,10 +274,15 @@
       //       否则缺口型号会出现「黄柱 > 仓库」，柱高与实物对不上。
       models.forEach((item, index) => {
         const available = item.warehouse - item.locked;
+        // 调货（已到位，蓝）：经广东一凌/厂家调拨入册的库存。这批货同时仍被项目锁定，
+        // 故从「项目锁定」段中划出、改用蓝色显示——柱高与勾稽不变：绿(可用)＋蓝(调货)＋黄(锁定)＝仓库。
+        const stockLocked = Math.min(Math.max(item.locked, 0), Math.max(item.warehouse, 0));
+        const transferValue = Math.min(Math.max(item.transfer || 0, 0), stockLocked);
         const segments = [
           { color: '#1f7a5c', sideColor: '#1f7a5c', label: '锁后可用', value: Math.max(available, 0) },
           { color: '#7cc9a1', sideColor: '#157a52', label: '在途库存', value: item.transit, textClass: 'chart-segment-value-dg' },
-          { color: '#f2b705', sideColor: '#8a6d00', label: '项目锁定', value: Math.min(item.locked, item.warehouse), stroke: '#a07d00', minHeight: 6, textClass: 'chart-segment-value-dark' },
+          { color: '#1f5d8f', sideColor: '#1f5d8f', label: '调货（已到位）', value: transferValue, stroke: '#123b64', minHeight: 6 },
+          { color: '#f2b705', sideColor: '#8a6d00', label: '项目锁定', value: stockLocked - transferValue, stroke: '#a07d00', minHeight: 6, textClass: 'chart-segment-value-dark' },
           { color: '#b42318', sideColor: '#b42318', label: '库存缺口', value: Math.max(-available, 0), stroke: '#7c1810', minHeight: 6 }
         ];
         let stackedValue = 0;
@@ -356,6 +362,16 @@
         locked.setAttribute('fill', '#8a6d00');
         locked.textContent = `｜锁${item.locked}`;
         label.append(first, second, classification, shape, quantities, transit, locked);
+        if (item.transfer) {
+          // 该型号含调货到位库存：柱下另起一行用蓝字标出，与柱身蓝色段呼应
+          const transferred = document.createElementNS(ns, 'tspan');
+          transferred.setAttribute('x', x(index));
+          transferred.setAttribute('dy', 16);
+          transferred.setAttribute('fill', '#1f5d8f');
+          transferred.setAttribute('font-weight', '700');
+          transferred.textContent = `调货${item.transfer}`;
+          label.append(transferred);
+        }
         if (available < 0) {
           const gap = document.createElementNS(ns, 'tspan');
           gap.setAttribute('x', x(index));
