@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0">
   <title>一凌库存状态看板 - 2026-09-16</title>
   <style>
-    :root { --ink:#102a43; --blue:#1f5d8f; --sky:#e8f2fa; --line:#d9e3ec; --green:#1f7a5c; --green-bg:#e7f6ef; --orange:#b45309; --orange-bg:#fff4df; --red:#b42318; --red-bg:#fff0ef; --muted:#627d98; }
+    :root { --ink:#102a43; --blue:#1f5d8f; --sky:#e8f2fa; --line:#d9e3ec; --green:#1f7a5c; --green-bg:#e7f6ef; --green-light:#7cc9a1; --green-light-bg:#ddf1e6; --green-light-text:#157a52; --orange:#b45309; --orange-bg:#fff4df; --red:#b42318; --red-bg:#fff0ef; --muted:#627d98; }
     * { box-sizing:border-box; }
     body { margin:0; color:var(--ink); background:#f5f8fb; font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; }
     main { max-width:1320px; margin:0 auto; padding:32px 24px 56px; }
@@ -40,7 +40,7 @@
     .number { text-align:right; font-variant-numeric:tabular-nums; }
     .pill { display:inline-block; padding:3px 8px; border-radius:999px; white-space:nowrap; font-size:12px; font-weight:650; }
     .warehouse { color:#126148; background:var(--green-bg); }
-    .transit { color:#9a5900; background:var(--orange-bg); }
+    .transit { color:var(--green-light-text); background:var(--green-light-bg); }
     .locked { color:#8a6d00; background:#fff4cc; }
     .unknown { color:#486581; background:#eaf0f5; }
     .short { color:var(--red); background:var(--red-bg); }
@@ -65,6 +65,7 @@
     .chart-segment-value-small { fill:var(--red); font-size:12px; font-weight:700; }
     /* 锁定段（黄柱）：白字在黄底上看不清，单独给深琥珀字；柱身太薄时数字移到柱右侧 */
     .chart-segment-value-dark { fill:#6b4e00; font-size:12px; font-weight:700; }
+    .chart-segment-value-dg { fill:#157a52; font-size:12px; font-weight:700; }
     /* 段太薄、数字放不进柱内时，数字挪到柱子右侧：白描边（paint-order:stroke）保证压在网格线上也读得清 */
     .chart-segment-value-side { font-size:12.5px; font-weight:700; paint-order:stroke; stroke:#fff; stroke-width:3.5px; stroke-linejoin:round; }
     details { margin-top:14px; border-top:1px solid var(--line); padding-top:14px; color:#486581; font-size:13px; line-height:1.7; }
@@ -83,10 +84,10 @@
 
     <section>
       <h2>各型号库存对比</h2>
-      <p class="section-note">每个型号为一根堆叠柱；绿色为扣除锁定后的仓库可用量，黄色锁定由同一批仓库库存划出，橙色为在途（已订未签收）。坐标框内同时列出完整型号、匹数、挂机/柜机及适用时的圆柱/方形外观。</p>
+      <p class="section-note">每个型号为一根堆叠柱；绿色为扣除锁定后的仓库可用量，黄色锁定由同一批仓库库存划出，浅绿色为在途（已订未签收，即已下单/已发货仍运输中）。坐标框内同时列出完整型号、匹数、挂机/柜机及适用时的圆柱/方形外观。</p>
       <div class="chart-legend" aria-label="图例">
         <span class="legend-item" style="color:var(--green)"><i class="legend-line"></i>锁后可用</span>
-        <span class="legend-item" style="color:var(--orange)"><i class="legend-line"></i>在途库存</span>
+        <span class="legend-item" style="color:var(--green-light-text)"><i class="legend-line" style="background:var(--green-light)"></i>在途库存（浅绿）</span>
         <span class="legend-item" style="color:#8a6d00"><i class="legend-line" style="background:#f2b705;border:1px solid #a07d00"></i>项目锁定（黄）</span>
         <span class="legend-item" style="color:var(--red)"><i class="legend-line" style="background:var(--red);border:1px solid #7c1810"></i>库存缺口（红柱＝还差几台）</span>
         <span class="legend-item" style="color:var(--blue)"><i class="legend-line" style="background:var(--blue)"></i>调货（已到位，蓝）</span>
@@ -265,16 +266,16 @@
       append('text', { x: 18, y: margin.top + plotHeight / 2, transform: `rotate(-90 18 ${margin.top + plotHeight / 2})`, class: 'chart-label' }, '数量（套）');
 
       const barWidth = Math.min(58, (plotWidth / models.length) * 0.55);
-      // 堆叠顺序（自下而上）：锁后可用(绿) → 在途(棕) → 有货覆盖的锁定(黄) → 库存缺口(红)。
+      // 堆叠顺序（自下而上）：锁后可用(绿) → 在途(浅绿) → 有货覆盖的锁定(黄) → 库存缺口(红)。
       // 缺口＝锁定超出仓库的部分，即「实际拿不到货」的台数，画成一根独立的红柱顶在最上面：
-      // 一根红柱写着 1 就是缺 1 台，写着 5 就是缺 5 台——和绿/黄/橙柱一样直接读数字，不再靠红框圈注。
+      // 一根红柱写着 1 就是缺 1 台，写着 5 就是缺 5 台——和绿/浅绿/黄柱一样直接读数字，不再靠红框圈注。
       // 说明：黄柱只画「仓库里有货、已被项目锁定」的部分（min(锁定, 仓库)），
       //       否则缺口型号会出现「黄柱 > 仓库」，柱高与实物对不上。
       models.forEach((item, index) => {
         const available = item.warehouse - item.locked;
         const segments = [
           { color: '#1f7a5c', sideColor: '#1f7a5c', label: '锁后可用', value: Math.max(available, 0) },
-          { color: '#b45309', sideColor: '#b45309', label: '在途库存', value: item.transit },
+          { color: '#7cc9a1', sideColor: '#157a52', label: '在途库存', value: item.transit, textClass: 'chart-segment-value-dg' },
           { color: '#f2b705', sideColor: '#8a6d00', label: '项目锁定', value: Math.min(item.locked, item.warehouse), stroke: '#a07d00', minHeight: 6, textClass: 'chart-segment-value-dark' },
           { color: '#b42318', sideColor: '#b42318', label: '库存缺口', value: Math.max(-available, 0), stroke: '#7c1810', minHeight: 6 }
         ];
@@ -349,7 +350,7 @@
         const transit = document.createElementNS(ns, 'tspan');
         transit.setAttribute('x', x(index));      // 设 x ＝ 另起一行
         transit.setAttribute('dy', 16);
-        transit.setAttribute('fill', '#b45309');
+        transit.setAttribute('fill', '#2e9e6b');
         transit.textContent = `在${item.transit}`;
         const locked = document.createElementNS(ns, 'tspan');
         locked.setAttribute('fill', '#8a6d00');
