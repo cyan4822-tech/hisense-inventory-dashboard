@@ -87,12 +87,13 @@
 
     <section>
       <h2>各型号库存对比</h2>
-      <p class="section-note">每个型号为一根堆叠柱；绿色为扣除锁定后的仓库可用量，黄色为从同一批仓库库存划出的项目锁定，浅绿色为在途（已订未签收，即已下单/已发货仍运输中；<strong>当前在途 0 套</strong>——OD-02 的 G860E 2P 30 台已于 2026-09-25 到仓）。<strong>科龙 <code>KFR-35GW/GK1U-X1</code> 已按用户 2026-10-08／10-09「茂名技师学院全单安装完成」的确认从当前在库与锁定同时移出，本图不再出现该型号</strong>（原「调货（已到位，蓝）」段机制保留备用，当前无该段数据）。坐标框内同时列出完整型号、匹数、挂机/柜机及适用时的圆柱/方形外观。</p>
+      <p class="section-note">每个型号为一根堆叠柱；绿色为扣除锁定后的仓库可用量，黄色为从同一批仓库库存划出的项目锁定，浅绿色为在途（已订未签收，即已下单/已发货仍运输中；<strong>当前在途 0 套</strong>——OD-02 的 G860E 2P 30 台已于 2026-09-25 到仓）。<strong>科龙 <code>KFR-35GW/GK1U-X1</code> 已按用户 2026-10-08／10-09「茂名技师学院全单安装完成」的确认从当前在库与锁定同时移出，本图不再出现该型号</strong>（原「调货（已到位，蓝）」段机制保留备用，当前无该段数据）。<strong>黑色段＝检测冻结坏机</strong>（G860E 2P 1 套，2026-10-06 从茂名拉回，<strong>不可销售</strong>，叠在良品柱之上单列、不计入可用或锁定）。坐标框内同时列出完整型号、匹数、挂机/柜机及适用时的圆柱/方形外观。</p>
       <div class="chart-legend" aria-label="图例">
         <span class="legend-item" style="color:var(--green)"><i class="legend-line"></i>锁后可用</span>
         <span class="legend-item" style="color:var(--green-light-text)"><i class="legend-line" style="background:var(--green-light)"></i>在途库存（浅绿）</span>
         <span class="legend-item" style="color:#8a6d00"><i class="legend-line" style="background:#f2b705;border:1px solid #a07d00"></i>项目锁定（黄）</span>
         <span class="legend-item" style="color:var(--red)"><i class="legend-line" style="background:var(--red);border:1px solid #7c1810"></i>库存缺口（红柱＝还差几台）</span>
+        <span class="legend-item" style="color:#111"><i class="legend-line" style="background:#111"></i>检测冻结坏机（黑）</span>
         <!-- 调货（已到位，蓝）图例：仅当存在 transfer>0 的型号时展示。2026-10-09 起科龙 GK1U 已移出，无该段数据，故不展示。 -->
       </div>
       <div class="chart-scroll"><svg id="inventoryChart" role="img" aria-label="各型号仓库、在途和项目锁定数量堆叠柱状图"></svg></div>
@@ -258,7 +259,7 @@
       const plotWidth = width - margin.left - margin.right;
       const plotHeight = height - margin.top - margin.bottom;
       // 柱总高 = 仓库库存 ＋ 缺口；缺口型号柱顶会多出一截红柱，故上界取 max(仓库, 锁定)
-      const maxValue = Math.max(...models.map((item) => Math.max(item.warehouse, item.locked) + item.transit));
+      const maxValue = Math.max(...models.map((item) => Math.max(item.warehouse, item.locked) + item.transit + (item.damaged || 0)));
       const yMax = Math.ceil(maxValue / 10) * 10;
       const labelInset = 90;
       const x = (index) => margin.left + labelInset + ((plotWidth - 2 * labelInset) * index) / (models.length - 1);
@@ -283,7 +284,8 @@
       append('text', { x: 18, y: margin.top + plotHeight / 2, transform: `rotate(-90 18 ${margin.top + plotHeight / 2})`, class: 'chart-label' }, '数量（套）');
 
       const barWidth = Math.min(58, (plotWidth / models.length) * 0.55);
-      // 堆叠顺序（自下而上）：锁后可用(绿) → 在途(浅绿) → 有货覆盖的锁定(黄) → 库存缺口(红)。
+      // 堆叠顺序（自下而上）：锁后可用(绿) → 在途(浅绿) → 调货(蓝) → 有货覆盖的锁定(黄) → 检测冻结坏机(黑) → 库存缺口(红)。
+        // 勾稽：绿(可用)＋蓝(调货)＋黄(锁定)＝良品仓库；黑(检测冻结)为不可销售件，叠在良品柱之上单列。
       // 缺口＝锁定超出仓库的部分，即「实际拿不到货」的台数，画成一根独立的红柱顶在最上面：
       // 一根红柱写着 1 就是缺 1 台，写着 5 就是缺 5 台——和绿/浅绿/黄柱一样直接读数字，不再靠红框圈注。
       // 说明：黄柱只画「仓库里有货、已被项目锁定」的部分（min(锁定, 仓库)），
@@ -299,6 +301,7 @@
           { color: '#7cc9a1', sideColor: '#157a52', label: '在途库存', value: item.transit, textClass: 'chart-segment-value-dg' },
           { color: '#1f5d8f', sideColor: '#1f5d8f', label: '调货（已到位）', value: transferValue, stroke: '#123b64', minHeight: 6 },
           { color: '#f2b705', sideColor: '#8a6d00', label: '项目锁定', value: stockLocked - transferValue, stroke: '#a07d00', minHeight: 6, textClass: 'chart-segment-value-dark' },
+          { color: '#111111', sideColor: '#111111', label: '检测冻结坏机', value: item.damaged || 0, stroke: '#000000', minHeight: 6 },
           { color: '#b42318', sideColor: '#b42318', label: '库存缺口', value: Math.max(-available, 0), stroke: '#7c1810', minHeight: 6 }
         ];
         let stackedValue = 0;
