@@ -71,6 +71,9 @@
     .chart-segment-value-dg { fill:#157a52; font-size:12px; font-weight:700; }
     /* 段太薄、数字放不进柱内时，数字挪到柱子右侧：白描边（paint-order:stroke）保证压在网格线上也读得清 */
     .chart-segment-value-side { font-size:12.5px; font-weight:700; paint-order:stroke; stroke:#fff; stroke-width:3.5px; stroke-linejoin:round; }
+    /* 各型号库存台账明细（2026-10-12 新增，置于柱状图下方，便于逐个数字核对）：编码列用小字等宽，表格不臃肿 */
+    .ledger-code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; color:var(--muted); white-space:nowrap; }
+    table tfoot td { background:#f7fafc; font-weight:700; border-top:2px solid var(--line); }
     details { margin-top:14px; border-top:1px solid var(--line); padding-top:14px; color:#486581; font-size:13px; line-height:1.7; }
     summary { cursor:pointer; color:var(--blue); font-weight:650; }
     .source-list { margin:8px 0 0; padding-left:20px; }
@@ -97,6 +100,17 @@
         <!-- 调货（已到位，蓝）图例：仅当存在 transfer>0 的型号时展示。2026-10-09 起科龙 GK1U 已移出，无该段数据，故不展示。 -->
       </div>
       <div class="chart-scroll"><svg id="inventoryChart" role="img" aria-label="各型号仓库、在途和项目锁定数量堆叠柱状图"></svg></div>
+    </section>
+
+    <section>
+      <h2>各型号库存台账明细（核对用）</h2>
+      <p class="section-note">与上方柱状图逐型号对应，便于对着数字核实。<strong>内机／外机编码与库存</strong>取自仓储源表「良品库存」期末库存（最小可配套单位，一台整机＝一台内机＋一台外机）；<strong>可出整机</strong>＝MIN(内机, 外机)；<strong>检测冻结／在途／已锁定／当前可用</strong>与柱状图、KPI 卡片同口径（当前可用＝看板良品仓库 − 已锁定）。<br><strong>① G860E 2P 行特例：</strong>源表可出整机 ＝ 39，而看板「良品仓库」＝ 40——多出的 1 套为 2026-09-05 运输损坏件，按既有「不预扣」口径仍计入良品仓库（见上方缺口说明）；故该行<strong>当前可用 ＝ 40 − 17 ＝ 23</strong>。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>型号</th><th>匹数｜机型</th><th>内机编码</th><th class="number">内机库存</th><th>外机编码</th><th class="number">外机库存</th><th class="number">可出整机</th><th class="number">检测冻结</th><th class="number">在途</th><th class="number">已锁定</th><th class="number">当前可用</th></tr></thead>
+        <tbody id="ledgerRows"></tbody>
+        <tfoot id="ledgerTotal"></tfoot>
+      </table></div>
+      <p class="section-note" style="margin:12px 0 0"><strong>数据来源：</strong>一凌自有仓储表 <code>10.6一凌库存表发送.xlsx</code>「良品库存」期末库存（与指定外仓表 <code>26年库存管理表 -一凌.xlsx</code>〔2026-10-08 10:51 版〕「凯尔仓」可用 348 内机＝174 套交叉一致）；检测冻结取同表「冻结库存」sheet（G860E 2P 内外机各 1）。<strong>本表由柱状图同一数据源派生，不单独维护</strong>——刷新库存时只改数据源，表内数字与 KPI、柱状图自动同步。口径与刷新流程见 <code>业务资料/00_使用指引/库存状态维护规则.md</code>。</p>
     </section>
 
     <div class="notice"><strong>使用边界：</strong>“仓库库存”来自 B2B 订单的已签收数量；“在途”= 已订未签收（含“已发货未签收”与“已下单/已申请未发货”两类，2026-09-18 起）。“项目锁定”只在有明确项目名称及锁货/调拨/发货指令时扣减。锁货口径（2026-09-15 起，DEC-20260915-01）：<strong>我方生成/定稿合同文档即视为要货确认、可据此锁库存</strong>；仅口头、报备中或未出合同文档的仍按“已知项目需求”不锁。<strong>2026-09-21 用户裁决：此前已出合同、要素齐全（客户项目／型号／数量／金额确定）而漏锁的单，按同一口径追溯补锁</strong>（本轮为广州市住房和城乡建设局 YLGS-26090554，补锁 G117U 1.5P 5＋G860E 2P 2）。<strong>2026-09-21 另立 DEC-20260921-12：客户已书面确认成交条件、且我方已盖章的报价单，视同要货确认、可据此锁库存</strong>（本轮为广州海关技术中心（珠江新城）第二单，依据客户最终确认的盖章报价单锁 G860E 2P 2 套）；合同要素不全、报价未经客户确认或金额口径存疑的仍不锁。锁后须逐型号核验可用量不为负，出现缺口的型号以红色标记。本看板仅按已明确的内部锁货指令扣减，实体仓冻结或调拨仍须由广东一凌落实。<strong>数据源新增（2026-09-28，DEC-20260928-03）：一凌自有仓储表（<code>9.xx一凌库存表发送.xlsx</code>）纳入常规核对源</strong>，用于覆盖指定外仓表停更时的盲区（本批 G860E 30 套到仓即据此确认）；两表口径不同（一凌自有表为良品库存口径），<strong>两者冲突时仍以指定外仓表为准，差异须当轮记录</strong>。<strong>2026-10-09 更新：指定外仓表已恢复更新并按年度改名为 <code>26年库存管理表 -一凌.xlsx</code>（2026-10-08 10:51 版），本轮以该权威源为唯一入库口径</strong>——其「凯尔仓」已补记 <strong>2026-9-25（入）30 套</strong>（与一凌自有表 9.25 版互证，09-28 转仓由此闭环）、<strong>2026-10-4（出）1 套</strong>与 <strong>2026-10-5（出）1 套</strong> G860E、<strong>2026-10-6（入）1 套</strong>（退回件，同表「破损」列 −1、入检测冻结仓，<strong>不计入可用</strong>）；「凯尔核对」表 350 内机＝175 套＝可用 174 ＋ 破损 1，已不再滞后。一凌自有表 10.6 版与权威源逐型号一致（G860E 良品期末 39、冻结 1）。<strong>2026-10-09 另按用户确认调整：茂名技师学院全单安装完成（用户 2026-10-08／10-09 确认），其科龙 <code>KFR-35GW/GK1U-X1</code> 1.5P 5 套从「在库 ＋ 项目锁定」同时移出（仓库 −5、锁定 −5），该型号不再在本看板展示</strong>；⚠ 该项属**用户确认、非源表可核项**（科龙系调货另册、凯尔仓本无此型号），出库凭证与实际安装日期待补。 <strong>⚠ 公开页边界（规则 §四）：本页只放库存看板所需的公开数据，客户台账、合同原件、报价原件、原始订单与联系方式均不入公开仓库——原列示的客户联系人电话已自本页移除，改注「见客户档」。</strong></div>
@@ -211,16 +225,16 @@
   </main>
   <script>
     const models = [
-      { model: 'KFR-26GW/G117U-X1', hp: '1P', type: '挂机', shape: '不适用', warehouse: 23, transit: 0, locked: 0 },
+      { model: 'KFR-26GW/G117U-X1', hp: '1P', type: '挂机', shape: '不适用', warehouse: 23, transit: 0, locked: 0, inCode: 'KFR-26G/G117U-X1（1V48）', inQty: 23, outCode: 'KFR-26W/H3U1X1(1V48)', outQty: 23 },
       // G117U 1.5P：锁定 5 套＝广州市住房和城乡建设局 5（YLGS-26090554，2026-09-09 我方定稿，2026-09-21 按 DEC-20260915-01 补锁）；沙园 1 套（YLGS-26090574）已于 2026-09-22 出库交付释放并同扣仓库（50→49）。
-      { model: 'KFR-35GW/G117U-X1', hp: '1.5P', type: '挂机', shape: '不适用', warehouse: 49, transit: 0, locked: 5 },
+      { model: 'KFR-35GW/G117U-X1', hp: '1.5P', type: '挂机', shape: '不适用', warehouse: 49, transit: 0, locked: 5, inCode: 'KFR-35G/G117U-X1（1X04）', inQty: 49, outCode: 'KFR-35W/H3UX1(1X04)', outQty: 49 },
       // 科龙 GK1U（KFR-35GW/GK1U-X1）：2026-09-21 经广东一凌/厂家调货 5 套入册并锁茂名技师学院（曾以蓝色「调货（已到位）」展示）。用户 2026-10-08／10-09 确认茂名技师学院全单安装完成 → 该 5 套从在库与项目锁定**同时移出**（仓库 −5、锁定 −5），本行不再展示；出库凭证与实际安装日期待补（见 Next-Actions 待核）。
       // G860E 2P：锁定 17 套＝GCXP空调（深圳市光明区建筑工务署）硬锁 15 ＋ 广州市住房和城乡建设局 2（YLGS-26090554，2026-09-21 按 DEC-20260915-01 补锁）；广州海关技术中心（珠江新城）第二单 2 套已于 2026-09-23 出库交付、锁定释放（见已归档区）。2026-09-25 OD-02 购货申请单的 30 套已到仓，仓库 12→42、在途 30→0、可用 −5→+25，缺口闭合（DEC-20260928-02）。2026-10-09：指定外仓表恢复更新（26年库存管理表 -一凌.xlsx，2026-10-08 10:51 版），新增 10-4 一诺暖通首单出库 1、10-5 茂名技师学院换机补发 1、10-6 退回件入检测冻结仓 1（破损列 −1），三笔净减 2 → 仓库 42→40、可用 +25→+23；凯尔仓可用 39 ＋ 9-5 损坏件 1（不预扣口径）＝40。
-      { model: 'KFR-50GW/G860E-X1', hp: '2P', type: '挂机', shape: '不适用', warehouse: 40, damaged: 1, transit: 0, locked: 17 },
-      { model: 'KFR-72GW/G860U-X1', hp: '3P', type: '挂机', shape: '不适用', warehouse: 25, transit: 0, locked: 0 },
-      { model: 'KFR-72LW/G888J-X1A', hp: '3P', type: '柜机', shape: '圆柱柜机', warehouse: 18, transit: 0, locked: 0 },
-      { model: 'KFR-50LW/G872C-X2', hp: '2P', type: '柜机', shape: '方形柜机', warehouse: 10, transit: 0, locked: 0 },
-      { model: 'KFR-72LW/G872C-X2', hp: '3P', type: '柜机', shape: '方形柜机', warehouse: 10, transit: 0, locked: 0 }
+      { model: 'KFR-50GW/G860E-X1', hp: '2P', type: '挂机', shape: '不适用', warehouse: 40, damaged: 1, transit: 0, locked: 17, inCode: 'KFR-50G/G860E-X1(1X57)', inQty: 39, outCode: 'KFR-50W/H3EX1(1X57)', outQty: 39 },
+      { model: 'KFR-72GW/G860U-X1', hp: '3P', type: '挂机', shape: '不适用', warehouse: 25, transit: 0, locked: 0, inCode: 'KFR-72G/G860U-X1(2X14)', inQty: 25, outCode: 'KFR-72W/H3UX1(2X14)', outQty: 25 },
+      { model: 'KFR-72LW/G888J-X1A', hp: '3P', type: '柜机', shape: '圆柱柜机', warehouse: 18, transit: 0, locked: 0, inCode: 'KFR-72L/G888J-X1A（2X05）', inQty: 18, outCode: 'KFR-72W/H3JX1（2X05）', outQty: 18 },
+      { model: 'KFR-50LW/G872C-X2', hp: '2P', type: '柜机', shape: '方形柜机', warehouse: 10, transit: 0, locked: 0, inCode: 'KFR-50L/G872C-X2(1X55)', inQty: 10, outCode: 'KFR-50W/H3C1X2(1X55)', outQty: 10 },
+      { model: 'KFR-72LW/G872C-X2', hp: '3P', type: '柜机', shape: '方形柜机', warehouse: 10, transit: 0, locked: 0, inCode: 'KFR-72L/G872C-X2(2X10)', inQty: 10, outCode: 'KFR-72W/H3C1X2(2X10)', outQty: 10 }
     ];
     const total = (key) => models.reduce((sum, item) => sum + (item[key] || 0), 0);
     const kpiItems = [
@@ -246,6 +260,24 @@
     };
     document.querySelectorAll('select').forEach((select) => select.addEventListener('change', renderRows));
     renderRows();
+
+    // 2026-10-12 用户要求：「库存这里还是要做个台账明细，在图笔（图表）下方，便于我查看核实」。
+    // 本表由上方 models 数组直接派生（与柱状图、KPI 卡同源），刷新库存时只需改 models，避免两处数字漂移。
+    const renderLedger = () => {
+      const num = (value) => `<td class="number">${value}</td>`;
+      const rows = models.map((item) => {
+        const buildable = Math.min(item.inQty, item.outQty);
+        const available = item.warehouse - (item.locked || 0);
+        // ① G860E 2P：源表可出整机 39，看板良品仓库 40（含未回收的 09-05 运输损坏件 1 套，沿用「不预扣」口径）
+        const flag = item.model === 'KFR-50GW/G860E-X1' ? ' <sup>①</sup>' : '';
+        const availCell = available < 0 ? `<td class="number cell-short"><strong>${available}</strong></td>` : `<td class="number"><strong>${available}</strong></td>`;
+        return `<tr><td>${item.model}</td><td>${item.hp}｜${item.type}</td><td class="ledger-code">${item.inCode}</td>${num(item.inQty)}<td class="ledger-code">${item.outCode}</td>${num(item.outQty)}<td class="number">${buildable}${flag}</td>${num(item.damaged || 0)}${num(item.transit || 0)}${num(item.locked || 0)}${availCell}</tr>`;
+      }).join('');
+      const buildableTotal = models.reduce((sum, item) => sum + Math.min(item.inQty, item.outQty), 0);
+      document.getElementById('ledgerRows').innerHTML = rows;
+      document.getElementById('ledgerTotal').innerHTML = `<tr><td>合计（${models.length} 个型号）</td><td>—</td><td>—</td>${num(total('inQty'))}<td>—</td>${num(total('outQty'))}${num(buildableTotal)}${num(total('damaged'))}${num(total('transit'))}${num(total('locked'))}${num(total('warehouse') - total('locked'))}</tr>`;
+    };
+    renderLedger();
 
     const renderInventoryChart = () => {
       const svg = document.getElementById('inventoryChart');
