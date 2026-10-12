@@ -73,6 +73,12 @@
     .chart-segment-value-side { font-size:12.5px; font-weight:700; paint-order:stroke; stroke:#fff; stroke-width:3.5px; stroke-linejoin:round; }
     /* 各型号库存台账明细（2026-10-12 新增，置于柱状图下方，便于逐个数字核对）：编码列用小字等宽，表格不臃肿 */
     .ledger-code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; color:var(--muted); white-space:nowrap; }
+    /* 出入库台账明细（2026-10-12 新增，逐笔流水，核对用）：方向标签 + 单据/流水号等宽小字 */
+    .io-in { color:#126148; background:var(--green-bg); }
+    .io-out { color:#8b3a00; background:#fff0df; }
+    .io-code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; color:var(--muted); white-space:nowrap; }
+    table.io-table th:nth-child(-n+6), table.io-table td:nth-child(-n+6) { white-space:nowrap; }
+    table.io-table td:nth-child(8) { white-space:normal; min-width:210px; }
     table tfoot td { background:#f7fafc; font-weight:700; border-top:2px solid var(--line); }
     details { margin-top:14px; border-top:1px solid var(--line); padding-top:14px; color:#486581; font-size:13px; line-height:1.7; }
     summary { cursor:pointer; color:var(--blue); font-weight:650; }
@@ -111,6 +117,17 @@
         <tfoot id="ledgerTotal"></tfoot>
       </table></div>
       <p class="section-note" style="margin:12px 0 0"><strong>数据来源：</strong>一凌自有仓储表 <code>10.6一凌库存表发送.xlsx</code>「良品库存」期末库存（与指定外仓表 <code>26年库存管理表 -一凌.xlsx</code>〔2026-10-08 10:51 版〕「凯尔仓」可用 348 内机＝174 套交叉一致）；检测冻结取同表「冻结库存」sheet（G860E 2P 内外机各 1）。<strong>本表由柱状图同一数据源派生，不单独维护</strong>——刷新库存时只改数据源，表内数字与 KPI、柱状图自动同步。口径与刷新流程见 <code>业务资料/00_使用指引/库存状态维护规则.md</code>。</p>
+    </section>
+
+    <section>
+      <h2>出入库台账明细（逐笔流水，核对用）</h2>
+      <p class="section-note">上面那张是<strong>结存</strong>（每个型号还剩多少），这张是<strong>流水</strong>——逐笔列出本批货的每一次入库与出库，便于对着结存数字倒推核实。一台整机＝一台内机＋一台外机；源表按内机／外机分行记账，本表已按<strong>套</strong>合并（逐笔内机数与外机数一致）。<strong>入库合计 225 套 − 出库合计 51 套 ＝ 结存 174 套</strong>，与上方柱状图、KPI 卡的「可出整机 174 套」完全吻合；另有 <strong>1 套退货件（2026-10-06）入检测冻结仓</strong>，不可销售、不计入结存。日期倒序、最新在上；<strong>入库行的「日期」＝凯尔入账日</strong>（流水号 <code>YLS＋YYMMDD</code>），实际到货日见「关联方 / 说明」列（入账通常晚到货 1 天）。</p>
+      <div class="table-wrap"><table class="io-table">
+        <thead><tr><th>日期</th><th>方向</th><th>单据号</th><th>凯尔流水号</th><th>型号</th><th>匹数｜机型</th><th class="number">数量（套）</th><th>关联方 / 说明</th></tr></thead>
+        <tbody id="ioRows"></tbody>
+        <tfoot id="ioTotal"></tfoot>
+      </table></div>
+      <p class="section-note" style="margin:12px 0 0"><strong>数据来源与口径：</strong>一凌自有仓储表 <code>10.6一凌库存表发送.xlsx</code> 的「收货明细」（入库）与「发货明细」（出库）。<strong>日期按凯尔流水号 <code>YLS/YLF＋YYMMDD</code> 还原</strong>——该表「到货日期」列整列存在 −1096 天（约 3 年）偏移，已弃用该列；「发货日期」列正常，与流水号一致。同表「指退明细」系今麦郎旧数据（2013 年、货主 JML），与本项目无关，未采用。明细截至源表 2026-10-07 导出时点（末笔为 2026-10-06 退货入仓）。<strong>本表为源表快照，换版时随看板一并刷新</strong>；刷新流程见 <code>业务资料/00_使用指引/库存状态维护规则.md</code>。</p>
     </section>
 
     <div class="notice"><strong>使用边界：</strong>“仓库库存”来自 B2B 订单的已签收数量；“在途”= 已订未签收（含“已发货未签收”与“已下单/已申请未发货”两类，2026-09-18 起）。“项目锁定”只在有明确项目名称及锁货/调拨/发货指令时扣减。锁货口径（2026-09-15 起，DEC-20260915-01）：<strong>我方生成/定稿合同文档即视为要货确认、可据此锁库存</strong>；仅口头、报备中或未出合同文档的仍按“已知项目需求”不锁。<strong>2026-09-21 用户裁决：此前已出合同、要素齐全（客户项目／型号／数量／金额确定）而漏锁的单，按同一口径追溯补锁</strong>（本轮为广州市住房和城乡建设局 YLGS-26090554，补锁 G117U 1.5P 5＋G860E 2P 2）。<strong>2026-09-21 另立 DEC-20260921-12：客户已书面确认成交条件、且我方已盖章的报价单，视同要货确认、可据此锁库存</strong>（本轮为广州海关技术中心（珠江新城）第二单，依据客户最终确认的盖章报价单锁 G860E 2P 2 套）；合同要素不全、报价未经客户确认或金额口径存疑的仍不锁。锁后须逐型号核验可用量不为负，出现缺口的型号以红色标记。本看板仅按已明确的内部锁货指令扣减，实体仓冻结或调拨仍须由广东一凌落实。<strong>数据源新增（2026-09-28，DEC-20260928-03）：一凌自有仓储表（<code>9.xx一凌库存表发送.xlsx</code>）纳入常规核对源</strong>，用于覆盖指定外仓表停更时的盲区（本批 G860E 30 套到仓即据此确认）；两表口径不同（一凌自有表为良品库存口径），<strong>两者冲突时仍以指定外仓表为准，差异须当轮记录</strong>。<strong>2026-10-09 更新：指定外仓表已恢复更新并按年度改名为 <code>26年库存管理表 -一凌.xlsx</code>（2026-10-08 10:51 版），本轮以该权威源为唯一入库口径</strong>——其「凯尔仓」已补记 <strong>2026-9-25（入）30 套</strong>（与一凌自有表 9.25 版互证，09-28 转仓由此闭环）、<strong>2026-10-4（出）1 套</strong>与 <strong>2026-10-5（出）1 套</strong> G860E、<strong>2026-10-6（入）1 套</strong>（退回件，同表「破损」列 −1、入检测冻结仓，<strong>不计入可用</strong>）；「凯尔核对」表 350 内机＝175 套＝可用 174 ＋ 破损 1，已不再滞后。一凌自有表 10.6 版与权威源逐型号一致（G860E 良品期末 39、冻结 1）。<strong>2026-10-09 另按用户确认调整：茂名技师学院全单安装完成（用户 2026-10-08／10-09 确认），其科龙 <code>KFR-35GW/GK1U-X1</code> 1.5P 5 套从「在库 ＋ 项目锁定」同时移出（仓库 −5、锁定 −5），该型号不再在本看板展示</strong>；⚠ 该项属**用户确认、非源表可核项**（科龙系调货另册、凯尔仓本无此型号），出库凭证与实际安装日期待补。 <strong>⚠ 公开页边界（规则 §四）：本页只放库存看板所需的公开数据，客户台账、合同原件、报价原件、原始订单与联系方式均不入公开仓库——原列示的客户联系人电话已自本页移除，改注「见客户档」。</strong></div>
@@ -278,6 +295,271 @@
       document.getElementById('ledgerTotal').innerHTML = `<tr><td>合计（${models.length} 个型号）</td><td>—</td><td>—</td>${num(total('inQty'))}<td>—</td>${num(total('outQty'))}${num(buildableTotal)}${num(total('damaged'))}${num(total('transit'))}${num(total('locked'))}${num(total('warehouse') - total('locked'))}</tr>`;
     };
     renderLedger();
+    // 2026-10-12 用户指正：「我指的是出入库的明细」——上表是结存（逐型号），本表补逐笔流水，两张都放柱状图下方。
+    // 数据源＝10.6一凌库存表发送.xlsx「收货明细」（入库）＋「发货明细」（出库），已按「套」合并内外机分行；
+    // 日期按流水号 YLS/YLF＋YYMMDD 还原（源表「到货日期」列有 −1096 天偏移，弃用）。
+    // 勾稽：入库 225 − 出库 51 ＝ 174 ＝ 柱状图/KPI 的「可出整机」；退货 1 套入检测冻结仓、不计入结存。
+    const ioRecords = [
+      {
+            "dir": "in",
+            "date": "2026-10-06",
+            "doc": "粵AD96788·退货",
+            "flow": "YLS26100601",
+            "model": "KFR-50GW/G860E-X1",
+            "hp": "2P",
+            "type": "挂机",
+            "qty": 1,
+            "note": "茂名技师学院退回件",
+            "frozen": true
+      },
+      {
+            "dir": "out",
+            "date": "2026-10-05",
+            "doc": "YLGS-26090579",
+            "flow": "YLF261005001",
+            "model": "KFR-50GW/G860E-X1",
+            "hp": "2P",
+            "type": "挂机",
+            "qty": 1,
+            "note": "茂名技师学院",
+            "frozen": false
+      },
+      {
+            "dir": "out",
+            "date": "2026-10-04",
+            "doc": "YLGS-26010603",
+            "flow": "YLF261004001",
+            "model": "KFR-50GW/G860E-X1",
+            "hp": "2P",
+            "type": "挂机",
+            "qty": 1,
+            "note": "广州市一诺暖通设备销售有限公司",
+            "frozen": false
+      },
+      {
+            "dir": "in",
+            "date": "2026-09-25",
+            "doc": "VVV2609240054",
+            "flow": "YLS26092501",
+            "model": "KFR-50GW/G860E-X1",
+            "hp": "2P",
+            "type": "挂机",
+            "qty": 30,
+            "note": "OD-02（09-24 到货·09-25 入册）",
+            "frozen": false
+      },
+      {
+            "dir": "out",
+            "date": "2026-09-23",
+            "doc": "YLGS-26090556-2",
+            "flow": "YLF260923001",
+            "model": "KFR-50GW/G860E-X1",
+            "hp": "2P",
+            "type": "挂机",
+            "qty": 2,
+            "note": "广州海关技术中心（珠江新城）",
+            "frozen": false
+      },
+      {
+            "dir": "out",
+            "date": "2026-09-22",
+            "doc": "YLGS-26090574",
+            "flow": "YLF260922001",
+            "model": "KFR-35GW/G117U-X1",
+            "hp": "1.5P",
+            "type": "挂机",
+            "qty": 1,
+            "note": "沙园街道办",
+            "frozen": false
+      },
+      {
+            "dir": "out",
+            "date": "2026-09-19",
+            "doc": "YLGS-26090579",
+            "flow": "YLF260919001",
+            "model": "KFR-50GW/G860E-X1",
+            "hp": "2P",
+            "type": "挂机",
+            "qty": 21,
+            "note": "茂名技师学院",
+            "frozen": false
+      },
+      {
+            "dir": "out",
+            "date": "2026-09-17",
+            "doc": "YLGS-26090556",
+            "flow": "YLF260917001",
+            "model": "KFR-50GW/G860E-X1",
+            "hp": "2P",
+            "type": "挂机",
+            "qty": 1,
+            "note": "广州海关技术中心",
+            "frozen": false
+      },
+      {
+            "dir": "out",
+            "date": "2026-09-15",
+            "doc": "YLGS-26090567",
+            "flow": "YLF260915001",
+            "model": "KFR-50GW/G860E-X1",
+            "hp": "2P",
+            "type": "挂机",
+            "qty": 1,
+            "note": "阳山县医疗保障局",
+            "frozen": false
+      },
+      {
+            "dir": "out",
+            "date": "2026-09-15",
+            "doc": "YLGS-26090558",
+            "flow": "YLF260915002",
+            "model": "KFR-50GW/G860E-X1",
+            "hp": "2P",
+            "type": "挂机",
+            "qty": 13,
+            "note": "阳山县秤架民族学校",
+            "frozen": false
+      },
+      {
+            "dir": "out",
+            "date": "2026-09-05",
+            "doc": "换货出库",
+            "flow": "YLF260905001",
+            "model": "KFR-50GW/G860E-X1",
+            "hp": "2P",
+            "type": "挂机",
+            "qty": 1,
+            "note": "运输损坏件换货出库（非销售）",
+            "frozen": false
+      },
+      {
+            "dir": "in",
+            "date": "2026-09-03",
+            "doc": "VVV2609020016",
+            "flow": "YLS26090301",
+            "model": "KFR-72LW/G872C-X2",
+            "hp": "3P",
+            "type": "柜机",
+            "qty": 10,
+            "note": "OD-01 第 3 批（09-02 到货·方柜）",
+            "frozen": false
+      },
+      {
+            "dir": "in",
+            "date": "2026-09-02",
+            "doc": "VVV2609010035",
+            "flow": "YLS26090201",
+            "model": "KFR-50LW/G872C-X2",
+            "hp": "2P",
+            "type": "柜机",
+            "qty": 10,
+            "note": "OD-01 第 2 批（09-01 到货·方柜）",
+            "frozen": false
+      },
+      {
+            "dir": "out",
+            "date": "2026-09-02",
+            "doc": "YLGS-26080523",
+            "flow": "YLF260902001",
+            "model": "KFR-26GW/G117U-X1",
+            "hp": "1P",
+            "type": "挂机",
+            "qty": 2,
+            "note": "清远市国防教育训练中心",
+            "frozen": false
+      },
+      {
+            "dir": "out",
+            "date": "2026-09-02",
+            "doc": "YLGS-26080523",
+            "flow": "YLF260902001",
+            "model": "KFR-72LW/G888J-X1A",
+            "hp": "3P",
+            "type": "柜机",
+            "qty": 7,
+            "note": "清远市国防教育训练中心",
+            "frozen": false
+      },
+      {
+            "dir": "in",
+            "date": "2026-08-29",
+            "doc": "WW2608280118",
+            "flow": "YLS26082901",
+            "model": "KFR-26GW/G117U-X1",
+            "hp": "1P",
+            "type": "挂机",
+            "qty": 25,
+            "note": "OD-01 首批（08-28 到货）",
+            "frozen": false
+      },
+      {
+            "dir": "in",
+            "date": "2026-08-29",
+            "doc": "WW2608280118",
+            "flow": "YLS26082901",
+            "model": "KFR-72LW/G888J-X1A",
+            "hp": "3P",
+            "type": "柜机",
+            "qty": 25,
+            "note": "OD-01 首批（08-28 到货）",
+            "frozen": false
+      },
+      {
+            "dir": "in",
+            "date": "2026-08-29",
+            "doc": "WW2608280118",
+            "flow": "YLS26082901",
+            "model": "KFR-35GW/G117U-X1",
+            "hp": "1.5P",
+            "type": "挂机",
+            "qty": 50,
+            "note": "OD-01 首批（08-28 到货）",
+            "frozen": false
+      },
+      {
+            "dir": "in",
+            "date": "2026-08-29",
+            "doc": "WW2608280001",
+            "flow": "YLS26082902",
+            "model": "KFR-72GW/G860U-X1",
+            "hp": "3P",
+            "type": "挂机",
+            "qty": 25,
+            "note": "OD-01 首批（08-28 到货）",
+            "frozen": false
+      },
+      {
+            "dir": "in",
+            "date": "2026-08-29",
+            "doc": "WW2608280001",
+            "flow": "YLS26082902",
+            "model": "KFR-50GW/G860E-X1",
+            "hp": "2P",
+            "type": "挂机",
+            "qty": 50,
+            "note": "OD-01 首批（08-28 到货）",
+            "frozen": false
+      }
+];
+
+    const renderIO = () => {
+      const dirPill = (dir) => (dir === 'in' ? '<span class="pill io-in">入库 ↑</span>' : '<span class="pill io-out">出库 ↓</span>');
+      const rows = ioRecords.map((item) => {
+        const qtyCell = item.dir === 'in'
+          ? `<td class="number" style="color:#126148"><strong>+${item.qty}</strong></td>`
+          : `<td class="number" style="color:#8b3a00"><strong>−${item.qty}</strong></td>`;
+        const note = item.frozen ? `${item.note}｜<strong>入检测冻结仓</strong>` : (item.note || '—');
+        return `<tr><td>${item.date}</td><td>${dirPill(item.dir)}</td><td>${item.doc}</td><td class="io-code">${item.flow}</td><td>${item.model}</td><td>${item.hp}｜${item.type}</td>${qtyCell}<td>${note}</td></tr>`;
+      }).join('');
+      const pick = (dir, frozen) => ioRecords.filter((x) => x.dir === dir && !!x.frozen === frozen);
+      const sum = (list) => list.reduce((acc, x) => acc + x.qty, 0);
+      const inGood = sum(pick('in', false));
+      const inFrozen = sum(pick('in', true));
+      const out = sum(pick('out', false));
+      document.getElementById('ioRows').innerHTML = rows;
+      document.getElementById('ioTotal').innerHTML = `<tr><td colspan="6">合计（入库 ${pick('in', false).length + pick('in', true).length} 行 ／ 出库 ${pick('out', false).length} 行，日期倒序）</td><td class="number"><strong>+${inGood - out}</strong></td><td>入库 ${inGood} 套 − 出库 ${out} 套 ＝ <strong>${inGood - out} 套</strong>（＝「可出整机」）；另 ${inFrozen} 套退货件入检测冻结仓、不计入</td></tr>`;
+    };
+    renderIO();
 
     const renderInventoryChart = () => {
       const svg = document.getElementById('inventoryChart');
