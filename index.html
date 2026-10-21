@@ -51,6 +51,7 @@
     .transit { color:var(--green-light-text); background:var(--green-light-bg); }
     .locked { color:#8a6d00; background:#fff4cc; }
     .unknown { color:#486581; background:#eaf0f5; }
+    .paused { color:#5b6470; background:#eceff2; }   /* 客户明确不需要／终止：中性灰，勿与检测冻结(damaged)混用 */
     .short { color:var(--red); background:var(--red-bg); }
     .transfer { color:var(--blue); background:var(--sky); }
     .cell-short { background:var(--red-bg); }
@@ -192,7 +193,7 @@
         <div class="table-wrap"><table class="project-table">
           <thead><tr><th>项目</th><th>型号与数量</th><th>当前阶段</th></tr></thead>
           <tbody>
-            <tr><td>茂名市公安局</td><td>3P 变频柜机 <code>KFR-72LW/G888J-X1A</code> 20 台 ＋ 1.5P 变频挂机 <code>KFR-35GW/G117U-X1</code> 56 台（合计 76 台，均要求一级能效）</td><td><span class="pill damaged">已暂停 · 客户不需要</span><br><strong>2026-10-21：客户明确表示「不需要了」，本单终止跟进</strong>（用户当日转达，DEC-20261021-03）。终止时点仅出过 2026-09-23 报价单（A 设备 233,640，B 辅材 7 项按实另计），<strong>无合同、无报备、无交付、无收款，且自始未锁库存</strong>——故本次终止<strong>不改动任何 <code>models</code> 锁定数、不改 KPI 合计</strong>，仅在「已知项目需求」表停计这 76 台，避免下一轮仍按在跟需求统计。报价单原件保留不清（历史交付件）。若客户回头：须按<strong>当期在效政策价</strong>重核报价（原价来自 8-9 月集采入围价，不得沿用）＋ 按 §七 三源重核可供性 ＋ 补齐经办人与报备口径。</td></tr>
+            <tr><td>茂名市公安局</td><td>3P 变频柜机 <code>KFR-72LW/G888J-X1A</code> 20 台 ＋ 1.5P 变频挂机 <code>KFR-35GW/G117U-X1</code> 56 台（合计 76 台，均要求一级能效）</td><td><span class="pill paused">已暂停 · 客户不需要</span><br><strong>2026-10-21：客户明确表示「不需要了」，本单终止跟进</strong>（用户当日转达，DEC-20261021-03）。终止时点仅出过 2026-09-23 报价单（A 设备 233,640，B 辅材 7 项按实另计），<strong>无合同、无报备、无交付、无收款，且自始未锁库存</strong>——故本次终止<strong>不改动任何 <code>models</code> 锁定数、不改 KPI 合计</strong>，仅在「已知项目需求」表停计这 76 台，避免下一轮仍按在跟需求统计。报价单原件保留不清（历史交付件）。若客户回头：须按<strong>当期在效政策价</strong>重核报价（原价来自 8-9 月集采入围价，不得沿用）＋ 按 §七 三源重核可供性 ＋ 补齐经办人与报备口径。</td></tr>
             <tr><td colspan="3"><span class="pill unknown">说明</span> 原登记的「广州海关技术中心（珠江新城）· 第二单」已于 2026-09-21 依<strong>客户最终确认的盖章报价单</strong>转入「项目锁定」表（DEC-20260921-12），并已于 <strong>2026-09-23 出库交付、锁定释放</strong>，现移入下方「已归档」区。</td></tr>
           </tbody>
         </table></div>
