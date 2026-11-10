@@ -70,11 +70,11 @@
     .legend-line { width:18px; height:12px; border-radius:2px; background:currentColor; }
     .chart-scroll { overflow-x:auto; }
     /* 首屏必见整图（2026-11-10 用户要求「第一页一眼看到图表」）：SVG 按容器宽度等比放大，
-       1440 宽时高达约 860px，整图必被首屏截断。限高 580px 后由 preserveAspectRatio
-       等比缩小并水平居中，配合页头单行摘要，整张柱状图落进 1440×900 首屏。 */
+       1440 宽时高达约 860px，整图必被首屏截断。改为「宽度上限」控制（限高不生效：
+       宽度仍 100% 撑开、内容居中缩放），配合页头单行摘要，整张柱状图落进 1440×900 首屏。
+       实测：1080/1280 → 680×468（卡片底 838）、1440 → 740×509（卡片底 878），均 <900。 */
     #inventoryChart { display:block; width:100%; max-width:680px; margin:0 auto; height:auto; }
-    /* 宽屏（≥1360）页头与说明更矮，可放宽到 820px（高约 564px），使大窗口下整图仍落在 900px 首屏内；
-       窄屏不放大，避免整图被首屏截断（2026-11-10 用户要求「第一页一眼看到图表」）。 */
+    /* 宽屏（≥1360）可放宽到 740px；试过 820px，1440×900 下卡片底 933 被切，故封顶 740。 */
     @media (min-width:1360px) { #inventoryChart { max-width:740px; } }
     .chart-grid { stroke:var(--line); stroke-width:1; }
     .chart-label { fill:var(--muted); font-size:12px; }
